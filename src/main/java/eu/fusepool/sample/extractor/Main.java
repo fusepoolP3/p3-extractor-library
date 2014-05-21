@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws Exception
     {
         Server server = new Server(8181);
-        server.setHandler(new SimpleExtractor());
+        server.setHandler(new ExtractorHandler(new SimpleExtractor()));
         server.start();
         server.join();
     }

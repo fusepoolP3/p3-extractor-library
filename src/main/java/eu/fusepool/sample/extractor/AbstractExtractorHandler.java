@@ -24,7 +24,7 @@ public abstract class AbstractExtractorHandler extends AbstractHandler {
 
     protected abstract Set<MimeType> getSupportedInputFormats();
     protected abstract Set<MimeType> getSupportedOutputFormats();
-
+    
     public void handle(String target, Request baseRequest, 
             HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {

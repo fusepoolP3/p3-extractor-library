@@ -6,9 +6,17 @@
 
 package eu.fusepool.sample.extractor;
 
+import eu.fusepool.sample.extractor.util.InputStreamEntity;
+import eu.fusepool.sample.extractor.util.WritingEntity;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedOutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.servlet.ServletException;
@@ -19,10 +27,10 @@ import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
 
-public abstract class RdfGeneratingExtractor extends AbstractExtractorHandler {
+public abstract class RdfGeneratingExtractor implements Extractor {
 
     @Override
-    protected Set<MimeType> getSupportedOutputFormats() {
+    public Set<MimeType> getSupportedOutputFormats() {
         final Set<String> supportedFormats = Serializer.getInstance().getSupportedFormats();
         final Set<MimeType> result = new HashSet<MimeType>();
         for (String string : supportedFormats) {
@@ -35,17 +43,34 @@ public abstract class RdfGeneratingExtractor extends AbstractExtractorHandler {
         return result;
     }
     
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public Entity extract(HttpRequestEntity entity) throws IOException {
         //TODO check content type matches supportedInputFormat
-        TripleCollection generatedRdf = generateRdf(request);
         //TODO content negotiation
         final String responseFormat = SupportedFormat.TURTLE;
-        response.setContentType(responseFormat);
-        response.setStatus(HttpServletResponse.SC_OK);
+        final TripleCollection generatedRdf = generateRdf(entity);
+        return new WritingEntity() {
+
+            @Override
+            public MimeType getType() {
+                try {
+                    return new MimeType(responseFormat);
+                } catch (MimeTypeParseException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            @Override
+            public void writeData(OutputStream out) throws IOException {    
+                Serializer.getInstance().serialize(out, generatedRdf, responseFormat);
+                out.flush();
+            }
+        };
+        
+        
         //baseRequest.setHandled(true);
-        Serializer.getInstance().serialize(response.getOutputStream(), generatedRdf, responseFormat);
+        
     }
 
-    protected abstract TripleCollection generateRdf(HttpServletRequest request) throws IOException, ServletException;
+    protected abstract TripleCollection generateRdf(Entity entity) throws IOException;
     
 }

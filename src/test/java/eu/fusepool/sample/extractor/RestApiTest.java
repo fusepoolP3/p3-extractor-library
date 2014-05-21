@@ -36,7 +36,7 @@ public class RestApiTest {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
         Server server = new Server(port);
-        server.setHandler(new SimpleExtractor());
+        server.setHandler(new ExtractorHandler(new SimpleExtractor()));
         server.start();
     }
 

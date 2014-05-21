@@ -27,7 +27,7 @@ import org.apache.commons.io.IOUtils;
 public class SimpleExtractor extends RdfGeneratingExtractor {
 
     @Override
-    protected Set<MimeType> getSupportedInputFormats() {
+    public Set<MimeType> getSupportedInputFormats() {
         try {
             MimeType mimeType = new MimeType("text/plain;charset=UTF-8");
             return Collections.singleton(mimeType);
@@ -37,9 +37,8 @@ public class SimpleExtractor extends RdfGeneratingExtractor {
     }
 
     @Override
-    protected TripleCollection generateRdf(HttpServletRequest request) throws IOException, ServletException {
-        final Reader in = request.getReader();
-        final String text = IOUtils.toString(in);
+    protected TripleCollection generateRdf(Entity entity) throws IOException {
+        final String text = IOUtils.toString(entity.getData(), "UTF-8");
         final TripleCollection result = new SimpleMGraph();
         final GraphNode node = new GraphNode(new BNode(), result);
         node.addProperty(RDF.type, new UriRef("http://example.org/ontology#TextDescription"));
@@ -47,5 +46,7 @@ public class SimpleExtractor extends RdfGeneratingExtractor {
         node.addPropertyValue(new UriRef("http://example.org/ontology#textLength"), text.length());
         return result;
     }
+
+
     
 }
