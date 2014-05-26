@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package eu.fusepool.sample.extractor;
 
-import org.eclipse.jetty.server.Server;
-import org.wymiwyg.commons.util.arguments.ArgumentHandler;
+import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
+import org.wymiwyg.commons.util.arguments.CommandLine;
 
 /**
  *
  * @author reto
  */
-public class Main {
-    public static void main(String[] args) throws Exception {
-        Arguments arguments = ArgumentHandler.readArguments(Arguments.class, args);
-        if (arguments != null) {
-            start(arguments);
-        }
-    }
+public interface Arguments extends ArgumentsWithHelp {
+    
 
-    private static void start(Arguments arguments) throws Exception {
-        Server server = new Server(arguments.getPort());
-        server.setHandler(new ExtractorHandler(new SimpleExtractor()));
-        server.start();
-        server.join();
-    }
+    @CommandLine(longName = "port", shortName = {"P"}, required = false,
+            defaultValue = "7100",
+            description = "The port on which the proxy shall listen")
+    public int getPort();
+    
 }
