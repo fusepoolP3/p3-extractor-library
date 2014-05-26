@@ -15,7 +15,7 @@
  */
 package eu.fusepool.sample.extractor;
 
-import eu.fusepool.extractor.ExtractorHandler;
+import eu.fusepool.extractor.ExtractorHandlerFactory;
 import org.eclipse.jetty.server.Server;
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
@@ -33,7 +33,7 @@ public class Main {
 
     private static void start(Arguments arguments) throws Exception {
         Server server = new Server(arguments.getPort());
-        server.setHandler(new ExtractorHandler(new SimpleExtractor()));
+        server.setHandler(ExtractorHandlerFactory.getExtractorHandler(new SimpleExtractor()));
         server.start();
         server.join();
     }

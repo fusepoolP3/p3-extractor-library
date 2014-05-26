@@ -18,7 +18,7 @@ import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
 
-public abstract class RdfGeneratingExtractor implements Extractor {
+public abstract class RdfGeneratingExtractor implements SyncExtractor {
 
     @Override
     public Set<MimeType> getSupportedOutputFormats() {

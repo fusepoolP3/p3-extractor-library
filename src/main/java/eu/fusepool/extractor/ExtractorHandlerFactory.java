@@ -16,17 +16,20 @@
 
 package eu.fusepool.extractor;
 
-import java.util.Set;
-import javax.activation.MimeType;
-
 /**
  *
  * @author reto
  */
-public interface Extractor {
-
-    Set<MimeType> getSupportedInputFormats();
-
-    Set<MimeType> getSupportedOutputFormats();
+public class ExtractorHandlerFactory {
+    public static AbstractExtractingHandler getExtractorHandler(SyncExtractor extractor) {
+       if (extractor.isLongRunning()) {
+            return new AsyncExtractorHandler(new LongRunningExtractorWrapper(extractor));
+        } else {
+            return new SyncExtractorHandler(extractor);
+        }
+    }
     
+    public AbstractExtractingHandler getExtractorHandler(AsyncExtractor extractor) {
+        return new AsyncExtractorHandler(extractor);
+    }
 }

@@ -15,14 +15,15 @@
  */
 package eu.fusepool.sample.extractor;
 
-import eu.fusepool.extractor.ExtractorHandler;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
+import eu.fusepool.extractor.ExtractorHandlerFactory;
 import java.net.ServerSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.http.HttpStatus;
 import org.eclipse.jetty.server.Server;
-import org.hamcrest.core.StringContains;
-import org.hamcrest.core.SubstringMatcher;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,19 +31,20 @@ import org.junit.Test;
  *
  * @author Reto
  */
-public class RestApiTest {
+public class AsyncRestApiTest {
 
     @Before
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
         Server server = new Server(port);
-        server.setHandler(new ExtractorHandler(new SimpleExtractor()));
+        server.setHandler(ExtractorHandlerFactory.getExtractorHandler(new LongRunningExtractor()));
         server.start();
     }
 
     @Test
     public void turtleOnGet() {
+        //Nothing Async-Specvific here
         Response response = RestAssured.given().header("Accept", "text/turtle")
                 .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle").when()
                 .get();
@@ -53,8 +55,32 @@ public class RestApiTest {
         Response response = RestAssured.given().header("Accept", "text/turtle")
                 .contentType("text/plain;charset=UTF-8")
                 .content("hello")
-                .expect().statusCode(HttpStatus.SC_OK).content(new StringContains("hello")).header("Content-Type", "text/turtle").when()
+                .expect().statusCode(HttpStatus.SC_ACCEPTED).when()
                 .post();
+        String location = response.getHeader("location");
+        Assert.assertNotNull("No location header in ACCEPTED- response", location);
+        //we assume the next request is perfomed before the task finished
+        Response response2 = RestAssured.given().header("Accept", "text/turtle")
+                .expect().statusCode(HttpStatus.SC_ACCEPTED)
+                .header("Content-Type", "text/turtle").when()
+                .get(location);
+        int count = 0;
+        while (response2.getStatusCode() == HttpStatus.SC_ACCEPTED) {
+            response2 = RestAssured.given().header("Accept", "text/turtle")
+                .expect()
+                .header("Content-Type", "text/turtle").when()
+                .get(location);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            if (count++ > 65) {
+                throw new RuntimeException("Async job not ending");
+            }
+        }
+        Assert.assertEquals("Didn't get a 200 response eventually", HttpStatus.SC_OK, response2.getStatusCode());
+        Assert.assertTrue("Result doesn't contain originally posted text", response2.getBody().asString().contains("hello"));
     }
 
     public static int findFreePort() {
