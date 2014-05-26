@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package eu.fusepool.sample.extractor.util;
+package eu.fusepool.extractor.util;
 
-import eu.fusepool.sample.extractor.Entity;
+import eu.fusepool.extractor.Entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;

@@ -15,6 +15,7 @@
  */
 package eu.fusepool.sample.extractor;
 
+import eu.fusepool.extractor.ExtractorHandler;
 import org.eclipse.jetty.server.Server;
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 

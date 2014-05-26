@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.fusepool.sample.extractor;
+package eu.fusepool.extractor;
 
-import eu.fusepool.sample.extractor.Entity;
-import eu.fusepool.sample.extractor.util.InputStreamEntity;
+import eu.fusepool.extractor.Entity;
+import eu.fusepool.extractor.util.InputStreamEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;

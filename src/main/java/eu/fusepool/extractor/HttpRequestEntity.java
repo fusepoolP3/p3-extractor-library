@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.sample.extractor;
+package eu.fusepool.extractor;
 
-import eu.fusepool.sample.extractor.util.InputStreamEntity;
+import eu.fusepool.extractor.util.InputStreamEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.activation.MimeType;

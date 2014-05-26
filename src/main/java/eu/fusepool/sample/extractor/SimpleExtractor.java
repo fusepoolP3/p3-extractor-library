@@ -6,6 +6,8 @@
 
 package eu.fusepool.sample.extractor;
 
+import eu.fusepool.extractor.Entity;
+import eu.fusepool.extractor.RdfGeneratingExtractor;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collections;

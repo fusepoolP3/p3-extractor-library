@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package eu.fusepool.sample.extractor;
+package eu.fusepool.extractor;
 
 import java.io.IOException;
 import java.io.InputStream;

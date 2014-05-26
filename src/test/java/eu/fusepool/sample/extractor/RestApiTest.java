@@ -15,6 +15,7 @@
  */
 package eu.fusepool.sample.extractor;
 
+import eu.fusepool.extractor.ExtractorHandler;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import java.net.ServerSocket;

@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-package eu.fusepool.sample.extractor;
+package eu.fusepool.extractor;
 
-import eu.fusepool.sample.extractor.util.InputStreamEntity;
-import eu.fusepool.sample.extractor.util.WritingEntity;
+import eu.fusepool.extractor.util.InputStreamEntity;
+import eu.fusepool.extractor.util.WritingEntity;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
