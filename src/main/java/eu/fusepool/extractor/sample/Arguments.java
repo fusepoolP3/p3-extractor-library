@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.fusepool.sample.extractor;
+package eu.fusepool.extractor.sample;
 
 import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
 import org.wymiwyg.commons.util.arguments.CommandLine;

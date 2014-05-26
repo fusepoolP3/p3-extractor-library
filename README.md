@@ -1,9 +1,22 @@
-# Sample Extractor
+# Java Extractor Implementation Library
 
-A minimalistic sample extractor and a testbed for some classes that might become
-generic support classes to facilitate the development of extractors.
+Provides a library to implement 
+[Extractors](https://github.com/fusepoolP3/overall-architecture/blob/master/data-extractor-importer-api.md)
+in Java.
 
-Compile and run with
+It supports both the asynchronous and the asynchronous modes of the REST API.
+
+Implementations can either implement the `eu.fusepool.extractor.SyncExtractor` or
+`eu.fusepool.extractor.AsyncExtractor` interface. The `SyncExtractor` provides a
+very simple API and has also support for long-running tasks that will be exposed 
+over the Asynchronous REST Interface.
+
+
+Minimalsitic sample extractor are conatined in the package 
+`eu.fusepool.extrqactor.sample`. The plackage alos conatins an executable main 
+class.
+
+Compile and run (the sample main class) with
 
     mvn clean install exec:java
 

@@ -15,12 +15,12 @@
  */
 package eu.fusepool.sample.extractor;
 
+import eu.fusepool.extractor.sample.SimpleExtractor;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
-import eu.fusepool.extractor.ExtractorHandlerFactory;
+import eu.fusepool.extractor.server.ExtractorServer;
 import java.net.ServerSocket;
 import org.apache.http.HttpStatus;
-import org.eclipse.jetty.server.Server;
 import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,9 +35,8 @@ public class SynRestApiTest {
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
-        Server server = new Server(port);
-        server.setHandler(ExtractorHandlerFactory.getExtractorHandler(new SimpleExtractor()));
-        server.start();
+        ExtractorServer server = new ExtractorServer(port);
+        server.start(new SimpleExtractor());
     }
 
     @Test

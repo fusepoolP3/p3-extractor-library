@@ -29,7 +29,16 @@ public class ExtractorHandlerFactory {
         }
     }
     
-    public AbstractExtractingHandler getExtractorHandler(AsyncExtractor extractor) {
+    public static AbstractExtractingHandler getExtractorHandler(AsyncExtractor extractor) {
         return new AsyncExtractorHandler(extractor);
+    }
+    
+    public static AbstractExtractingHandler getExtractorHandler(Extractor extractor) {
+        if (extractor instanceof SyncExtractor) {
+            return getExtractorHandler((SyncExtractor)extractor);
+        } else {
+            return getExtractorHandler((AsyncExtractor)extractor);
+        }
+        
     }
 }

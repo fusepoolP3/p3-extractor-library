@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.sample.extractor;
+package eu.fusepool.extractor.server;
 
+import eu.fusepool.extractor.*;
 import eu.fusepool.extractor.ExtractorHandlerFactory;
 import org.eclipse.jetty.server.Server;
-import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
 /**
  *
  * @author reto
  */
-public class Main {
-    public static void main(String[] args) throws Exception {
-        Arguments arguments = ArgumentHandler.readArguments(Arguments.class, args);
-        if (arguments != null) {
-            start(arguments);
-        }
-    }
+public class ExtractorServer {
 
-    private static void start(Arguments arguments) throws Exception {
-        Server server = new Server(arguments.getPort());
-        server.setHandler(ExtractorHandlerFactory.getExtractorHandler(new SimpleExtractor()));
+    private final Server server;
+
+    public ExtractorServer(int port) {
+        server = new Server(port);
+    }
+    
+    /**
+     * 
+     * @param extractor
+     * @throws Exception ugly, but so does the underlying Jetty Server
+     */
+    public void start(Extractor extractor) throws Exception {
+        server.setHandler(ExtractorHandlerFactory.getExtractorHandler(extractor));
         server.start();
+        
+    }
+    
+    public void join() throws InterruptedException {
         server.join();
     }
 }
