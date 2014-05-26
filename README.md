@@ -12,8 +12,8 @@ very simple API and has also support for long-running tasks that will be exposed
 over the Asynchronous REST Interface.
 
 
-Minimalsitic sample extractor are conatined in the package 
-`eu.fusepool.extrqactor.sample`. The plackage alos conatins an executable main 
+Minimalistic sample extractor are contained in the package 
+`eu.fusepool.extractor.sample`. The package also contains an executable main 
 class.
 
 Compile and run (the sample main class) with
