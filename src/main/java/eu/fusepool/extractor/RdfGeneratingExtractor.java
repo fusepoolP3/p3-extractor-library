@@ -6,22 +6,13 @@
 
 package eu.fusepool.extractor;
 
-import eu.fusepool.extractor.util.InputStreamEntity;
 import eu.fusepool.extractor.util.WritingEntity;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedOutputStream;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
