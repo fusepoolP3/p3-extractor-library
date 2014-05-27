@@ -19,19 +19,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import javax.activation.MimeType;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
-import org.apache.clerezza.rdf.core.impl.TripleImpl;
-import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
-import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.utils.GraphNode;
 
 /**
@@ -41,9 +34,9 @@ import org.apache.clerezza.rdf.utils.GraphNode;
 class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.CallBackHandler {
 
     private final AsyncExtractor extractor;
-    private final Map<String, RequestStatus> requests = new HashMap<String, RequestStatus>();
+    private final Map<String, RequestResult> requests = new HashMap<String, RequestResult>();
     private static final String JOB_URI_PREFIX = "/job/";
-    
+
     AsyncExtractorHandler(AsyncExtractor extractor) {
         super(extractor);
         this.extractor = extractor;
@@ -52,8 +45,7 @@ class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.C
 
     @Override
     protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-        final String requestId = JOB_URI_PREFIX+UUID.randomUUID().toString();
-        requests.put(requestId, new RequestStatus());
+        final String requestId = JOB_URI_PREFIX + UUID.randomUUID().toString();
         extractor.extract(new HttpRequestEntity(request), requestId);
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
         response.setHeader("Location", requestId);
@@ -64,68 +56,64 @@ class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.C
     protected void handleGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String requestUri = request.getRequestURI();
         if (requestUri.startsWith(JOB_URI_PREFIX)) {
-            final RequestStatus requestStatus = requests.get(requestUri);
-            if (requestStatus == null) {
+            final RequestResult requestResult = requests.get(requestUri);
+            if ((requestResult == null)
+                    && (!extractor.isActive(requestUri))) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
+
             }
-            if (requestStatus.entity == null) {
-                if (requestStatus.exception != null) {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    PrintWriter out = response.getWriter();
-                    requestStatus.exception.printStackTrace(out);
-                    out.flush();
-                } else {
-                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                    GraphNode responseNode = getServiceNode(request);
-                    responseNode.addProperty(new UriRef("http://fusepool.eu/ontology/p3#status"), 
-                            new UriRef("http://fusepool.eu/ontology/p3#Processing"));
-                    respondFromNode(response, responseNode);
-                }
+            if (requestResult == null) {
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                GraphNode responseNode = getServiceNode(request);
+                responseNode.addProperty(new UriRef("http://fusepool.eu/ontology/p3#status"),
+                        new UriRef("http://fusepool.eu/ontology/p3#Processing"));
+                respondFromNode(response, responseNode);
+            }
+
+            if (requestResult.exception != null) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                PrintWriter out = response.getWriter();
+                requestResult.exception.printStackTrace(out);
+                out.flush();
             } else {
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentType(requestStatus.entity.getType().toString());
+                response.setContentType(requestResult.entity.getType().toString());
                 ServletOutputStream out = response.getOutputStream();
-                requestStatus.entity.writeData(out);
+                requestResult.entity.writeData(out);
                 out.flush();
             }
         } else {
             super.handleGet(request, response);
         }
     }
-    
-    
-    
+
     @Override
-    public void responseAvailable(String requestId, Entity response) {
-        requests.put(requestId, new RequestStatus(response));
+    public void responseAvailable(String requestId, Entity response
+    ) {
+        requests.put(requestId, new RequestResult(response));
     }
 
     @Override
-    public void reportException(String requestId, Exception ex) {
-        requests.put(requestId, new RequestStatus(ex));
+    public void reportException(String requestId, Exception ex
+    ) {
+        requests.put(requestId, new RequestResult(ex));
     }
 
-    static class RequestStatus {
+    static class RequestResult {
 
-        public RequestStatus() {
-            entity = null;
-            exception = null;
-        }
-        
-        public RequestStatus(Exception exception) {
+        public RequestResult(Exception exception) {
             this.exception = exception;
             entity = null;
         }
 
-        public RequestStatus(Entity entity) {
+        public RequestResult(Entity entity) {
             this.entity = entity;
             exception = null;
         }
-        
+
         final Entity entity;
         final Exception exception;
     }
-    
 
 }

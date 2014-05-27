@@ -29,7 +29,7 @@ import javax.activation.MimeType;
 class LongRunningExtractorWrapper implements AsyncExtractor {
     private CallBackHandler callBackHandler;
     private final SyncExtractor wrapped;
-    private Set<String> activeRequests = Collections.synchronizedSet(new HashSet<String>());
+    private final Set<String> activeRequests = Collections.synchronizedSet(new HashSet<String>());
 
     public LongRunningExtractorWrapper(SyncExtractor wrapped) {
         this.wrapped = wrapped;

@@ -23,13 +23,14 @@ import java.io.InputStream;
 import javax.activation.MimeType;
 
 /**
- * The reason for this class is that the InputStream for a Request that has 
- * already returned is no longer available from the HttpRequest.
+ * As the InputStream for a Request that has 
+ * already returned is no longer available from the HttpRequest this class allows
+ * to pre-read (cache) an entity.
  * 
  * @author reto
  */
 //TODO check if other fields of HttpRequest, namely MediaType are still accessible
-class PreReadEntity extends HttpRequestEntity {
+public class PreReadEntity extends HttpRequestEntity {
     private final HttpRequestEntity wrapped;
     private final byte[] data;
 

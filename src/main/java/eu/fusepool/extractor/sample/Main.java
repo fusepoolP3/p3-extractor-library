@@ -32,8 +32,10 @@ public class Main {
 
     private static void start(Arguments arguments) throws Exception {
         ExtractorServer server = new ExtractorServer(arguments.getPort());
+        //alternatives:
         server.start(new SimpleExtractor());
-        //alternatively: server.start(new LongRunningExtractor());
+        //server.start(new LongRunningExtractor());
+        //server.start(new SimpleAsyncExtractor());
         server.join();
     }
 }

@@ -18,13 +18,10 @@ package eu.fusepool.sample.extractor;
 import eu.fusepool.extractor.sample.LongRunningExtractor;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
-import eu.fusepool.extractor.ExtractorHandlerFactory;
+import eu.fusepool.extractor.sample.SimpleAsyncExtractor;
 import eu.fusepool.extractor.server.ExtractorServer;
 import java.net.ServerSocket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.http.HttpStatus;
-import org.eclipse.jetty.server.Server;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,14 +30,14 @@ import org.junit.Test;
  *
  * @author Reto
  */
-public class AsyncRestApiTest {
+public class AsyncExtractorRestTest {
 
     @Before
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
         ExtractorServer server = new ExtractorServer(port);
-        server.start(new LongRunningExtractor());
+        server.start(new SimpleAsyncExtractor());
     }
 
     @Test
@@ -69,7 +66,7 @@ public class AsyncRestApiTest {
         while (response2.getStatusCode() == HttpStatus.SC_ACCEPTED) {
             response2 = RestAssured.given().header("Accept", "text/turtle")
                 .expect()
-                .header("Content-Type", "text/turtle").when()
+                .when()
                 .get(location);
             try {
                 Thread.sleep(1000);
