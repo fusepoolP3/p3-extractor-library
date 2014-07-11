@@ -7,6 +7,7 @@
 package eu.fusepool.extractor.sample;
 
 import eu.fusepool.extractor.Entity;
+import eu.fusepool.extractor.HttpRequestEntity;
 import eu.fusepool.extractor.RdfGeneratingExtractor;
 import java.io.IOException;
 import java.util.Collections;
@@ -36,7 +37,7 @@ public class SimpleExtractor extends RdfGeneratingExtractor {
     }
 
     @Override
-    protected TripleCollection generateRdf(Entity entity) throws IOException {
+    protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
         final String text = IOUtils.toString(entity.getData(), "UTF-8");
         final TripleCollection result = new SimpleMGraph();
         final GraphNode node = new GraphNode(new BNode(), result);
