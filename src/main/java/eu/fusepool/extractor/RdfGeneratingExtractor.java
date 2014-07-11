@@ -62,6 +62,6 @@ public abstract class RdfGeneratingExtractor implements SyncExtractor {
         
     }
 
-    protected abstract TripleCollection generateRdf(Entity entity) throws IOException;
+    protected abstract TripleCollection generateRdf(HttpRequestEntity entity) throws IOException;
     
 }
