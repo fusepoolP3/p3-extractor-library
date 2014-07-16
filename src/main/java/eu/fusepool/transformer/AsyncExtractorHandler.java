@@ -57,18 +57,17 @@ class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.C
         final String requestUri = request.getRequestURI();
         if (requestUri.startsWith(JOB_URI_PREFIX)) {
             final RequestResult requestResult = requests.get(requestUri);
-            if ((requestResult == null)
-                    && (!extractor.isActive(requestUri))) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-
-            }
             if (requestResult == null) {
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                GraphNode responseNode = getServiceNode(request);
-                responseNode.addProperty(new UriRef("http://fusepool.eu/ontology/p3#status"),
-                        new UriRef("http://fusepool.eu/ontology/p3#Processing"));
-                respondFromNode(response, responseNode);
+                if (extractor.isActive(requestUri)) {
+                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    GraphNode responseNode = getServiceNode(request);
+                    responseNode.addProperty(new UriRef("http://fusepool.eu/ontology/p3#status"),
+                            new UriRef("http://fusepool.eu/ontology/p3#Processing"));
+                    respondFromNode(response, responseNode);
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }               
+                return;
             }
 
             if (requestResult.exception != null) {
