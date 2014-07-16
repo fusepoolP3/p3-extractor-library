@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.extractor.server;
+package eu.fusepool.transformer.server;
 
-import eu.fusepool.extractor.*;
-import eu.fusepool.extractor.ExtractorHandlerFactory;
+import eu.fusepool.transformer.Extractor;
+import eu.fusepool.transformer.ExtractorHandlerFactory;
 import org.eclipse.jetty.server.Server;
 
 /**
  *
  * @author reto
  */
-public class ExtractorServer {
+public class TransformerServer {
 
     private final Server server;
 
-    public ExtractorServer(int port) {
+    public TransformerServer(int port) {
         server = new Server(port);
     }
     

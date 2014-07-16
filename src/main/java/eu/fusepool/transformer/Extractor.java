@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Bern University of Applied Sciences.
+ * Copyright 2014 reto.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package eu.fusepool.extractor.sample;
+package eu.fusepool.transformer;
 
-import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
-import org.wymiwyg.commons.util.arguments.CommandLine;
+import java.util.Set;
+import javax.activation.MimeType;
 
 /**
  *
  * @author reto
  */
-public interface Arguments extends ArgumentsWithHelp {
-    
+public interface Extractor {
 
-    @CommandLine(longName = "port", shortName = {"P"}, required = false,
-            defaultValue = "7100",
-            description = "The port on which the proxy shall listen")
-    public int getPort();
+    Set<MimeType> getSupportedInputFormats();
+
+    Set<MimeType> getSupportedOutputFormats();
     
 }

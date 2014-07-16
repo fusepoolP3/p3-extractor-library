@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.extractor.sample;
+package eu.fusepool.transformer.sample;
 
-import eu.fusepool.extractor.server.ExtractorServer;
+import eu.fusepool.transformer.server.TransformerServer;
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
 /**
@@ -31,9 +31,9 @@ public class Main {
     }
 
     private static void start(Arguments arguments) throws Exception {
-        ExtractorServer server = new ExtractorServer(arguments.getPort());
+        TransformerServer server = new TransformerServer(arguments.getPort());
         //alternatives:
-        server.start(new SimpleExtractor());
+        server.start(new SimpleTransformer());
         //server.start(new LongRunningExtractor());
         //server.start(new SimpleAsyncExtractor());
         server.join();

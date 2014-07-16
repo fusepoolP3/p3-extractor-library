@@ -1,19 +1,19 @@
-# Java Extractor Implementation Library
+# Java Transformer Implementation Library
 
 Provides a library to implement 
-[Extractors](https://github.com/fusepoolP3/overall-architecture/blob/master/data-extractor-importer-api.md)
+[Transformers](https://github.com/fusepoolP3/overall-architecture/blob/master/data-transformer-api.md)
 in Java.
 
 It supports both the asynchronous and the asynchronous modes of the REST API.
 
-Implementations can either implement the `eu.fusepool.extractor.SyncExtractor` or
-`eu.fusepool.extractor.AsyncExtractor` interface. The `SyncExtractor` provides a
+Implementations can either implement the `eu.fusepool.transformer.SyncTransformer` or
+`eu.fusepool.transformer.AsyncTransformer` interface. The `SyncTransformer` provides a
 very simple API and has also support for long-running tasks that will be exposed 
 over the Asynchronous REST Interface.
 
 
-Minimalistic sample extractor are contained in the package 
-`eu.fusepool.extractor.sample`. The package also contains an executable main 
+Minimalistic sample transformers are contained in the package 
+`eu.fusepool.transformer.sample`. The package also contains an executable main 
 class.
 
 Compile and run (the sample main class) with

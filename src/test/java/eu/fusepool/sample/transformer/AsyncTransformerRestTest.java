@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.sample.extractor;
+package eu.fusepool.sample.transformer;
 
-import eu.fusepool.extractor.sample.LongRunningExtractor;
+import eu.fusepool.transformer.sample.LongRunningTransformer;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
-import eu.fusepool.extractor.sample.SimpleAsyncExtractor;
-import eu.fusepool.extractor.server.ExtractorServer;
+import eu.fusepool.transformer.sample.SimpleAsyncTransformer;
+import eu.fusepool.transformer.server.TransformerServer;
 import java.net.ServerSocket;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
@@ -30,14 +30,14 @@ import org.junit.Test;
  *
  * @author Reto
  */
-public class AsyncExtractorRestTest {
+public class AsyncTransformerRestTest {
 
     @Before
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
-        ExtractorServer server = new ExtractorServer(port);
-        server.start(new SimpleAsyncExtractor());
+        TransformerServer server = new TransformerServer(port);
+        server.start(new SimpleAsyncTransformer());
     }
 
     @Test

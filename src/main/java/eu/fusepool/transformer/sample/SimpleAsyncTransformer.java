@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package eu.fusepool.extractor.sample;
+package eu.fusepool.transformer.sample;
 
-import eu.fusepool.extractor.AsyncExtractor;
-import eu.fusepool.extractor.Entity;
-import eu.fusepool.extractor.HttpRequestEntity;
-import eu.fusepool.extractor.PreReadEntity;
-import eu.fusepool.extractor.util.WritingEntity;
+import eu.fusepool.transformer.AsyncExtractor;
+import eu.fusepool.transformer.Entity;
+import eu.fusepool.transformer.HttpRequestEntity;
+import eu.fusepool.transformer.PreReadEntity;
+import eu.fusepool.transformer.util.WritingEntity;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -36,7 +36,7 @@ import org.apache.commons.io.IOUtils;
  *
  * @author reto
  */
-public class SimpleAsyncExtractor implements AsyncExtractor {
+public class SimpleAsyncTransformer implements AsyncExtractor {
 
     final Queue<ExtractorJob> pendingJobs = new ConcurrentLinkedQueue<>();// Collections.synchronizedSet(new HashSet<>());
     final Set<String> activeJobs = Collections.synchronizedSet(new HashSet<String>());

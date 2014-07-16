@@ -4,11 +4,11 @@
  * and open the template in the editor.
  */
 
-package eu.fusepool.extractor.sample;
+package eu.fusepool.transformer.sample;
 
-import eu.fusepool.extractor.Entity;
-import eu.fusepool.extractor.HttpRequestEntity;
-import eu.fusepool.extractor.RdfGeneratingExtractor;
+import eu.fusepool.transformer.Entity;
+import eu.fusepool.transformer.HttpRequestEntity;
+import eu.fusepool.transformer.RdfGeneratingExtractor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
@@ -24,7 +24,7 @@ import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.commons.io.IOUtils;
 
 
-public class SimpleExtractor extends RdfGeneratingExtractor {
+public class SimpleTransformer extends RdfGeneratingExtractor {
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {

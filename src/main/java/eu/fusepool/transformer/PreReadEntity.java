@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.fusepool.extractor;
+package eu.fusepool.transformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

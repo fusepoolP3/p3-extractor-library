@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.fusepool.extractor;
+package eu.fusepool.transformer;
 
 import java.util.Set;
 import javax.activation.MimeType;
@@ -23,10 +23,21 @@ import javax.activation.MimeType;
  *
  * @author reto
  */
-public interface Extractor {
+abstract class ExtractorHandler extends AbstractExtractingHandler {
+    private final Extractor extractor;
 
-    Set<MimeType> getSupportedInputFormats();
+    public ExtractorHandler(Extractor extractor) {
+        this.extractor = extractor;
+    }
 
-    Set<MimeType> getSupportedOutputFormats();
+    @Override
+    protected Set<MimeType> getSupportedInputFormats() {
+        return extractor.getSupportedInputFormats();
+    }
+
+    @Override
+    protected Set<MimeType> getSupportedOutputFormats() {
+        return extractor.getSupportedOutputFormats();
+    }
     
 }
