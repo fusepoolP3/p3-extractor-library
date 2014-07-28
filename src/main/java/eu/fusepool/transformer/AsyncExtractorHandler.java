@@ -15,6 +15,7 @@
  */
 package eu.fusepool.transformer;
 
+import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -61,8 +62,8 @@ class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.C
                 if (extractor.isActive(requestUri)) {
                     response.setStatus(HttpServletResponse.SC_ACCEPTED);
                     GraphNode responseNode = getServiceNode(request);
-                    responseNode.addProperty(new UriRef("http://fusepool.eu/ontology/p3#status"),
-                            new UriRef("http://fusepool.eu/ontology/p3#Processing"));
+                    responseNode.addProperty(TRANSFORMER.status,
+                            TRANSFORMER.Processing);
                     respondFromNode(response, responseNode);
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);

@@ -5,6 +5,7 @@
  */
 package eu.fusepool.transformer;
 
+import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;
 import java.util.Set;
 import javax.activation.MimeType;
@@ -61,10 +62,10 @@ public abstract class AbstractExtractingHandler extends AbstractHandler {
     protected void handleGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final GraphNode node = getServiceNode(request);
         for (MimeType mimeType : getSupportedInputFormats()) {
-            node.addPropertyValue(new UriRef("http://fusepool.eu/ontology/p3#supportedInputFormat"), mimeType.toString());
+            node.addPropertyValue(TRANSFORMER.supportedInputFormat, mimeType.toString());
         }
         for (MimeType mimeType : getSupportedOutputFormats()) {
-            node.addPropertyValue(new UriRef("http://fusepool.eu/ontology/p3#supportedOutputFormat"), mimeType.toString());
+            node.addPropertyValue(TRANSFORMER.supportedOutputFormat, mimeType.toString());
         }
         response.setStatus(HttpServletResponse.SC_OK);
         respondFromNode(response, node);
