@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 reto.
+ * Copyright 2014 Bern University of Applied Sciences.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package eu.fusepool.transformer.util;
+package eu.fusepool.p3.transformer.sample;
 
-import eu.fusepool.transformer.Entity;
-import java.io.IOException;
-import java.io.OutputStream;
-import org.apache.commons.io.IOUtils;
+import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
+import org.wymiwyg.commons.util.arguments.CommandLine;
 
 /**
- * Use this is you have an InputStream and need an Entity.
+ *
+ * @author reto
  */
-public abstract class InputStreamEntity implements Entity {
+public interface Arguments extends ArgumentsWithHelp {
+    
 
-    @Override
-    public void writeData(OutputStream out) throws IOException {
-        IOUtils.copy(getData(), out);
-    }
+    @CommandLine(longName = "port", shortName = {"P"}, required = false,
+            defaultValue = "7100",
+            description = "The port on which the proxy shall listen")
+    public int getPort();
     
 }

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package eu.fusepool.transformer;
+package eu.fusepool.p3.transformer;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.transformer.sample;
+package eu.fusepool.p3.transformer.sample;
 
-import eu.fusepool.transformer.server.TransformerServer;
+import eu.fusepool.p3.transformer.server.TransformerServer;
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
 
 /**

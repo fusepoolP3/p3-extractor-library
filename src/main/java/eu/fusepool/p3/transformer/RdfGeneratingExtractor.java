@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package eu.fusepool.transformer;
+package eu.fusepool.p3.transformer;
 
-import eu.fusepool.transformer.util.WritingEntity;
+import eu.fusepool.p3.transformer.util.WritingEntity;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.transformer.server;
+package eu.fusepool.p3.transformer.server;
 
-import eu.fusepool.transformer.Extractor;
-import eu.fusepool.transformer.ExtractorHandlerFactory;
+import eu.fusepool.p3.transformer.Extractor;
+import eu.fusepool.p3.transformer.ExtractorHandlerFactory;
 import org.eclipse.jetty.server.Server;
 
 /**

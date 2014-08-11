@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package eu.fusepool.transformer.util;
+package eu.fusepool.p3.transformer.util;
 
-import eu.fusepool.transformer.Entity;
+import eu.fusepool.p3.transformer.Entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;

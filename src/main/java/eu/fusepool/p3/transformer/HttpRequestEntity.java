@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.transformer;
+package eu.fusepool.p3.transformer;
 
-import eu.fusepool.transformer.util.InputStreamEntity;
+import eu.fusepool.p3.transformer.util.InputStreamEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.activation.MimeType;

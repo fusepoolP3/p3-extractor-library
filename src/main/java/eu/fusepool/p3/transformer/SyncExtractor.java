@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package eu.fusepool.p3.transformer;
 
-package eu.fusepool.transformer.sample;
-
-import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
-import org.wymiwyg.commons.util.arguments.CommandLine;
+import java.io.IOException;
 
 /**
- *
+ * Synchronous Java API for extractor services. Even services implementing this 
+ * interface will be exposed using the asynchronous REST API if they are marked
+ * as long-running.
+ * 
  * @author reto
  */
-public interface Arguments extends ArgumentsWithHelp {
-    
+public interface SyncExtractor extends Extractor {
 
-    @CommandLine(longName = "port", shortName = {"P"}, required = false,
-            defaultValue = "7100",
-            description = "The port on which the proxy shall listen")
-    public int getPort();
+
+    Entity extract(HttpRequestEntity entity) throws IOException;
     
+    /**
+     * Indicates if the extract method performs a long running task. In this
+     * case the server will exposes the service using the asynchronous protocol.
+     * 
+     * @return true if this is a long running task, false otherwise
+     */
+    boolean isLongRunning();
+
 }

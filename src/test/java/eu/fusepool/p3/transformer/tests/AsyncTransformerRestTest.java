@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.sample.transformer;
+package eu.fusepool.p3.transformer.tests;
 
-import eu.fusepool.transformer.sample.LongRunningTransformer;
+import eu.fusepool.p3.transformer.sample.LongRunningTransformer;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
-import eu.fusepool.transformer.server.TransformerServer;
+import eu.fusepool.p3.transformer.sample.SimpleAsyncTransformer;
+import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.net.ServerSocket;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
@@ -29,14 +30,14 @@ import org.junit.Test;
  *
  * @author Reto
  */
-public class LongRunningTransformerRestTest {
+public class AsyncTransformerRestTest {
 
     @Before
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
         TransformerServer server = new TransformerServer(port);
-        server.start(new LongRunningTransformer());
+        server.start(new SimpleAsyncTransformer());
     }
 
     @Test
@@ -65,7 +66,7 @@ public class LongRunningTransformerRestTest {
         while (response2.getStatusCode() == HttpStatus.SC_ACCEPTED) {
             response2 = RestAssured.given().header("Accept", "text/turtle")
                 .expect()
-                .header("Content-Type", "text/turtle").when()
+                .when()
                 .get(location);
             try {
                 Thread.sleep(1000);
