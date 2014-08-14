@@ -17,10 +17,10 @@
 package eu.fusepool.p3.transformer.sample;
 
 import eu.fusepool.p3.transformer.AsyncExtractor;
-import eu.fusepool.p3.transformer.Entity;
+import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.PreReadEntity;
-import eu.fusepool.p3.transformer.util.WritingEntity;
+import eu.fusepool.p3.transformer.commons.util.WritingEntity;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;

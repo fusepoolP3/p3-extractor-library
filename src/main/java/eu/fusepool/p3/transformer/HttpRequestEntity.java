@@ -15,7 +15,7 @@
  */
 package eu.fusepool.p3.transformer;
 
-import eu.fusepool.p3.transformer.util.InputStreamEntity;
+import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.activation.MimeType;

@@ -6,7 +6,7 @@
 
 package eu.fusepool.p3.transformer.sample;
 
-import eu.fusepool.p3.transformer.Entity;
+import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.RdfGeneratingExtractor;
 import java.io.IOException;

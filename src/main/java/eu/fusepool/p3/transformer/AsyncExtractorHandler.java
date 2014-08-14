@@ -15,6 +15,7 @@
  */
 package eu.fusepool.p3.transformer;
 
+import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;
 import java.io.PrintWriter;
