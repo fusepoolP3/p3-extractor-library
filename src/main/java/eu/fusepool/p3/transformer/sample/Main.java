@@ -34,8 +34,8 @@ public class Main {
         TransformerServer server = new TransformerServer(arguments.getPort());
         //alternatives:
         server.start(new SimpleTransformer());
-        //server.start(new LongRunningExtractor());
-        //server.start(new SimpleAsyncExtractor());
+        //server.start(new LongRunningTransformer());
+        //server.start(new SimpleAsyncTransformer());
         server.join();
     }
 }

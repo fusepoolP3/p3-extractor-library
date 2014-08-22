@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Bern University of Applied Sciences.
+ * Copyright 2014 reto.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,21 @@ import javax.activation.MimeType;
  *
  * @author reto
  */
-public interface Extractor {
+abstract class TransformerHandler extends AbstractTransformingHandler {
+    private final Transformer transformer;
 
-    Set<MimeType> getSupportedInputFormats();
+    public TransformerHandler(Transformer transformer) {
+        this.transformer = transformer;
+    }
 
-    Set<MimeType> getSupportedOutputFormats();
+    @Override
+    protected Set<MimeType> getSupportedInputFormats() {
+        return transformer.getSupportedInputFormats();
+    }
+
+    @Override
+    protected Set<MimeType> getSupportedOutputFormats() {
+        return transformer.getSupportedOutputFormats();
+    }
     
 }

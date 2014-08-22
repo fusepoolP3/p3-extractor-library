@@ -19,19 +19,19 @@ import eu.fusepool.p3.transformer.commons.Entity;
 import java.io.IOException;
 
 /**
- * Synchronous Java API for extractor services. Even services implementing this 
+ * Synchronous Java API for transformer services. Even services implementing this 
  * interface will be exposed using the asynchronous REST API if they are marked
  * as long-running.
  * 
  * @author reto
  */
-public interface SyncExtractor extends Extractor {
+public interface SyncTransformer extends Transformer {
 
 
-    Entity extract(HttpRequestEntity entity) throws IOException;
+    Entity transform(HttpRequestEntity entity) throws IOException;
     
     /**
-     * Indicates if the extract method performs a long running task. In this
+     * Indicates if the transform method performs a long running task. In this
      * case the server will exposes the service using the asynchronous protocol.
      * 
      * @return true if this is a long running task, false otherwise

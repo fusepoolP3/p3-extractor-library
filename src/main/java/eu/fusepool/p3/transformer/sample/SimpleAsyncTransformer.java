@@ -16,7 +16,7 @@
 
 package eu.fusepool.p3.transformer.sample;
 
-import eu.fusepool.p3.transformer.AsyncExtractor;
+import eu.fusepool.p3.transformer.AsyncTransformer;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.PreReadEntity;
@@ -36,9 +36,9 @@ import org.apache.commons.io.IOUtils;
  *
  * @author reto
  */
-public class SimpleAsyncTransformer implements AsyncExtractor {
+public class SimpleAsyncTransformer implements AsyncTransformer {
 
-    final Queue<ExtractorJob> pendingJobs = new ConcurrentLinkedQueue<>();// Collections.synchronizedSet(new HashSet<>());
+    final Queue<TransformerJob> pendingJobs = new ConcurrentLinkedQueue<>();// Collections.synchronizedSet(new HashSet<>());
     final Set<String> activeJobs = Collections.synchronizedSet(new HashSet<String>());
     private CallBackHandler callBackHandler;
     
@@ -50,11 +50,11 @@ public class SimpleAsyncTransformer implements AsyncExtractor {
     }
 
     @Override
-    public void extract(HttpRequestEntity entity, String requestId) throws IOException {
+    public void transform(HttpRequestEntity entity, String requestId) throws IOException {
         activeJobs.add(requestId);
         final PreReadEntity preReadEntity = new PreReadEntity(entity);
-        ExtractorJob extractorJob = new ExtractorJob(preReadEntity, requestId);
-        pendingJobs.add(extractorJob);
+        TransformerJob transformerJob = new TransformerJob(preReadEntity, requestId);
+        pendingJobs.add(transformerJob);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class SimpleAsyncTransformer implements AsyncExtractor {
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }                
-                final ExtractorJob job = pendingJobs.poll();
+                final TransformerJob job = pendingJobs.poll();
                 if (job != null)  {
                     final Entity responseEntity = new WritingEntity() {
 
@@ -126,11 +126,11 @@ public class SimpleAsyncTransformer implements AsyncExtractor {
         
     }
 
-    private static class ExtractorJob {
+    private static class TransformerJob {
         private final String requestId;
         private final HttpRequestEntity entity;
 
-        public ExtractorJob(HttpRequestEntity entity, String requestId) {
+        public TransformerJob(HttpRequestEntity entity, String requestId) {
             this.entity = entity;
             this.requestId = requestId;
         }

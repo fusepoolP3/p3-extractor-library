@@ -8,7 +8,7 @@ package eu.fusepool.p3.transformer.sample;
 
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
-import eu.fusepool.p3.transformer.RdfGeneratingExtractor;
+import eu.fusepool.p3.transformer.RdfGeneratingTransformer;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
@@ -24,7 +24,7 @@ import org.apache.clerezza.rdf.utils.GraphNode;
 import org.apache.commons.io.IOUtils;
 
 
-public class SimpleTransformer extends RdfGeneratingExtractor {
+public class SimpleTransformer extends RdfGeneratingTransformer {
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {

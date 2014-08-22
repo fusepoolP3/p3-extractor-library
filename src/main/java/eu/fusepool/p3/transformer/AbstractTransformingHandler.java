@@ -26,12 +26,12 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 /**
  * This class provides the default service description page. Concrete 
  * implemetations provide the actual POST functionality. Normally there's no
- * need to subclass this class, rather typically an Extractor is written and
- * a Handler is created for it using the ExtractorHandlerFactory.
+ * need to subclass this class, rather typically an Transformer is written and
+ * a Handler is created for it using the TransformerHandlerFactory.
  * 
  * @author reto
  */
-public abstract class AbstractExtractingHandler extends AbstractHandler {
+public abstract class AbstractTransformingHandler extends AbstractHandler {
 
     protected abstract Set<MimeType> getSupportedInputFormats();
     protected abstract Set<MimeType> getSupportedOutputFormats();

@@ -19,7 +19,7 @@ import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
 
-public abstract class RdfGeneratingExtractor implements SyncExtractor {
+public abstract class RdfGeneratingTransformer implements SyncTransformer {
 
     @Override
     public Set<MimeType> getSupportedOutputFormats() {
@@ -35,7 +35,7 @@ public abstract class RdfGeneratingExtractor implements SyncExtractor {
         return result;
     }
     
-    public Entity extract(HttpRequestEntity entity) throws IOException {
+    public Entity transform(HttpRequestEntity entity) throws IOException {
         //TODO check content type matches supportedInputFormat
         //TODO content negotiation
         final String responseFormat = SupportedFormat.TURTLE;

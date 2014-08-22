@@ -25,18 +25,18 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author reto
  */
-class SyncExtractorHandler extends ExtractorHandler {
+class SyncTransformerHandler extends TransformerHandler {
 
-    private SyncExtractor extractor;
+    private SyncTransformer transformer;
 
-    SyncExtractorHandler(SyncExtractor extractor) {
-        super(extractor);
-        this.extractor = extractor;
+    SyncTransformerHandler(SyncTransformer transformer) {
+        super(transformer);
+        this.transformer = transformer;
     }
 
     @Override
     protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-        Entity responseEntity = extractor.extract(new HttpRequestEntity(request));
+        Entity responseEntity = transformer.transform(new HttpRequestEntity(request));
         response.setContentType(responseEntity.getType().toString());
         responseEntity.writeData(response.getOutputStream());
         response.getOutputStream().flush();

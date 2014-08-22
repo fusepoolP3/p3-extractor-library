@@ -20,20 +20,20 @@ import java.io.IOException;
 
 
 /**
- * For asynchronous extractor the response entity is provided to a CallBackHandler
- * (typically) after the extract method returned.
+ * For asynchronous transformer the response entity is provided to a CallBackHandler
+ (typically) after the transform method returned.
  * 
- * The reason why there is a single callBackHandler per extractor and not one
- * CallBackHandler per request (i.e. per invocation of the extract method) is to
- * allow extractions tasks to survive restarts of the server. For example when
- * an extraction is requested the extract method might send and email, a thread
- * checking the mailbox for an email answer might be started by the 
- * activate method. The email answer would contain the requestId allowing to map 
- * a received answer email to the original request.
+ * The reason why there is a single callBackHandler per transformer and not one
+ CallBackHandler per request (i.e. per invocation of the transform method) is to
+ allow transformation tasks to survive restarts of the server. For example when
+ a transformation is requested the transform method might send and email, a thread
+ checking the mailbox for an email answer might be started by the 
+ activate method. The email answer would contain the requestId allowing to map 
+ a received answer email to the original request.
  * 
  * @author reto
  */
-public interface AsyncExtractor extends Extractor {
+public interface AsyncTransformer extends Transformer {
 
     public interface  CallBackHandler {
         abstract void responseAvailable(String requestId, Entity response);
@@ -43,15 +43,15 @@ public interface AsyncExtractor extends Extractor {
 
     void activate(CallBackHandler callBackHandler);
     
-    void extract(HttpRequestEntity entity, String requestId) throws IOException;
+    void transform(HttpRequestEntity entity, String requestId) throws IOException;
     
     /**
-     * Checks if a requestId is being processed by the Extractor. The extractor
+     * Checks if a requestId is being processed by the Transformer. The Transformer
      * should return true if CallBackHandler.responseAvailable might be called
      * for the given requestId.
      * 
      * @param requestId the requestId
-     * @return true if the extractor is processing a request, false otherwise.
+     * @return true if the Transformer is processing a request, false otherwise.
      */
     boolean isActive(String requestId);
 

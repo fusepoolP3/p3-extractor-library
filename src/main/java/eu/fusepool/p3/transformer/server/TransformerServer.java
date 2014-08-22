@@ -15,8 +15,8 @@
  */
 package eu.fusepool.p3.transformer.server;
 
-import eu.fusepool.p3.transformer.Extractor;
-import eu.fusepool.p3.transformer.ExtractorHandlerFactory;
+import eu.fusepool.p3.transformer.Transformer;
+import eu.fusepool.p3.transformer.TransformerHandlerFactory;
 import org.eclipse.jetty.server.Server;
 
 /**
@@ -33,11 +33,11 @@ public class TransformerServer {
     
     /**
      * 
-     * @param extractor
+     * @param transformer
      * @throws Exception ugly, but so does the underlying Jetty Server
      */
-    public void start(Extractor extractor) throws Exception {
-        server.setHandler(ExtractorHandlerFactory.getExtractorHandler(extractor));
+    public void start(Transformer transformer) throws Exception {
+        server.setHandler(TransformerHandlerFactory.getTransformerHandler(transformer));
         server.start();
         
     }

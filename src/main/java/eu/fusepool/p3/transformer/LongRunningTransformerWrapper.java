@@ -26,12 +26,12 @@ import javax.activation.MimeType;
  *
  * @author reto
  */
-class LongRunningExtractorWrapper implements AsyncExtractor {
+class LongRunningTransformerWrapper implements AsyncTransformer {
     private CallBackHandler callBackHandler;
-    private final SyncExtractor wrapped;
+    private final SyncTransformer wrapped;
     private final Set<String> activeRequests = Collections.synchronizedSet(new HashSet<String>());
 
-    public LongRunningExtractorWrapper(SyncExtractor wrapped) {
+    public LongRunningTransformerWrapper(SyncTransformer wrapped) {
         this.wrapped = wrapped;
     }
 
@@ -41,7 +41,7 @@ class LongRunningExtractorWrapper implements AsyncExtractor {
     }
 
     @Override
-    public void extract(final HttpRequestEntity requestEntity, final String requestId) throws IOException {
+    public void transform(final HttpRequestEntity requestEntity, final String requestId) throws IOException {
         activeRequests.add(requestId);
         final PreReadEntity preReadEntity = new PreReadEntity(requestEntity);
         (new Thread() {
@@ -49,7 +49,7 @@ class LongRunningExtractorWrapper implements AsyncExtractor {
             @Override
             public void run() {
                 try {
-                    callBackHandler.responseAvailable(requestId, wrapped.extract(preReadEntity));
+                    callBackHandler.responseAvailable(requestId, wrapped.transform(preReadEntity));
                 } catch (Exception ex) {
                     callBackHandler.reportException(requestId, ex);
                 } 

@@ -26,29 +26,28 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.utils.GraphNode;
 
 /**
  *
  * @author reto
  */
-class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.CallBackHandler {
+class AsyncTransformerHandler extends TransformerHandler implements AsyncTransformer.CallBackHandler {
 
-    private final AsyncExtractor extractor;
+    private final AsyncTransformer transformer;
     private final Map<String, RequestResult> requests = new HashMap<String, RequestResult>();
     private static final String JOB_URI_PREFIX = "/job/";
 
-    AsyncExtractorHandler(AsyncExtractor extractor) {
-        super(extractor);
-        this.extractor = extractor;
-        extractor.activate(this);
+    AsyncTransformerHandler(AsyncTransformer transformer) {
+        super(transformer);
+        this.transformer = transformer;
+        transformer.activate(this);
     }
 
     @Override
     protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
         final String requestId = JOB_URI_PREFIX + UUID.randomUUID().toString();
-        extractor.extract(new HttpRequestEntity(request), requestId);
+        transformer.transform(new HttpRequestEntity(request), requestId);
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
         response.setHeader("Location", requestId);
         response.getOutputStream().flush();
@@ -60,7 +59,7 @@ class AsyncExtractorHandler extends ExtractorHandler implements AsyncExtractor.C
         if (requestUri.startsWith(JOB_URI_PREFIX)) {
             final RequestResult requestResult = requests.get(requestUri);
             if (requestResult == null) {
-                if (extractor.isActive(requestUri)) {
+                if (transformer.isActive(requestUri)) {
                     response.setStatus(HttpServletResponse.SC_ACCEPTED);
                     GraphNode responseNode = getServiceNode(request);
                     responseNode.addProperty(TRANSFORMER.status,
