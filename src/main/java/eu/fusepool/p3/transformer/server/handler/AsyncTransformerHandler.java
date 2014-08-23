@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.fusepool.p3.transformer;
+package eu.fusepool.p3.transformer.server.handler;
 
+import eu.fusepool.p3.transformer.AsyncTransformer;
+import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package eu.fusepool.p3.transformer;
+package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;

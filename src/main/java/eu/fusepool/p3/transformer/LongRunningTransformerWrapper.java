@@ -23,10 +23,11 @@ import java.util.Set;
 import javax.activation.MimeType;
 
 /**
- *
+ * Wraps a SyncTransformer as an AsyncTransormer. The intended usage 
+ * is for long running transformers.
  * @author reto
  */
-class LongRunningTransformerWrapper implements AsyncTransformer {
+public class LongRunningTransformerWrapper implements AsyncTransformer {
     private CallBackHandler callBackHandler;
     private final SyncTransformer wrapped;
     private final Set<String> activeRequests = Collections.synchronizedSet(new HashSet<String>());

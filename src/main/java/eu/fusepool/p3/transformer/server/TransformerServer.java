@@ -16,7 +16,7 @@
 package eu.fusepool.p3.transformer.server;
 
 import eu.fusepool.p3.transformer.Transformer;
-import eu.fusepool.p3.transformer.TransformerHandlerFactory;
+import eu.fusepool.p3.transformer.server.handler.TransformerHandlerFactory;
 import org.eclipse.jetty.server.Server;
 
 /**

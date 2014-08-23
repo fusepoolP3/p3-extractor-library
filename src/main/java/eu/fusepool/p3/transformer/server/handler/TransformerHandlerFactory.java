@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-package eu.fusepool.p3.transformer;
+package eu.fusepool.p3.transformer.server.handler;
+
+import eu.fusepool.p3.transformer.AsyncTransformer;
+import eu.fusepool.p3.transformer.LongRunningTransformerWrapper;
+import eu.fusepool.p3.transformer.SyncTransformer;
+import eu.fusepool.p3.transformer.Transformer;
 
 /**
  *

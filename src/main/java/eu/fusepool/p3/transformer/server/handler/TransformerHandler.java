@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package eu.fusepool.p3.transformer;
+package eu.fusepool.p3.transformer.server.handler;
 
+import eu.fusepool.p3.transformer.Transformer;
 import java.util.Set;
 import javax.activation.MimeType;
 
