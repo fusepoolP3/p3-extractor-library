@@ -15,7 +15,9 @@
  */
 package eu.fusepool.p3.transformer.server;
 
+import eu.fusepool.p3.transformer.server.handler.TransformerFactoryHandler;
 import eu.fusepool.p3.transformer.Transformer;
+import eu.fusepool.p3.transformer.TransformerFactory;
 import eu.fusepool.p3.transformer.server.handler.TransformerHandlerFactory;
 import org.eclipse.jetty.server.Server;
 
@@ -39,7 +41,11 @@ public class TransformerServer {
     public void start(Transformer transformer) throws Exception {
         server.setHandler(TransformerHandlerFactory.getTransformerHandler(transformer));
         server.start();
-        
+    }
+    
+    public void start(TransformerFactory factory) throws Exception {
+        server.setHandler(new TransformerFactoryHandler(factory));
+        server.start();   
     }
     
     public void join() throws InterruptedException {
