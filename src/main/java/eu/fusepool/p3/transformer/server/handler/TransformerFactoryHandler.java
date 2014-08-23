@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,24 +32,33 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
  * @author reto
  */
 public class TransformerFactoryHandler extends AbstractHandler {
+
     private final TransformerFactory factory;
+    private final Map<Transformer, Handler> transfomerHandlerMap = new HashMap<>();
 
     public TransformerFactoryHandler(TransformerFactory factory) {
         this.factory = factory;
     }
 
     @Override
-    public void handle(String target, Request baseRequest, 
-            HttpServletRequest request, HttpServletResponse response) 
+    public void handle(String target, Request baseRequest,
+            HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         final Transformer transformer = factory.getTransformer(request);
         if (transformer == null) {
             response.sendError(404);
-        } else  {
-            final Handler handler = TransformerHandlerFactory.getTransformerHandler(transformer);
+        } else {
+            Handler handler;
+            synchronized (this) {
+                if (transfomerHandlerMap.containsKey(transformer)) {
+                    handler = transfomerHandlerMap.get(transformer);
+                } else {
+                    handler = TransformerHandlerFactory.getTransformerHandler(transformer);
+                    transfomerHandlerMap.put(transformer, handler);
+                }
+            }
             handler.handle(target, baseRequest, request, response);
         }
     }
 
-   
 }
