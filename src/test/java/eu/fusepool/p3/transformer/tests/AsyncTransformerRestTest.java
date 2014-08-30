@@ -15,7 +15,6 @@
  */
 package eu.fusepool.p3.transformer.tests;
 
-import eu.fusepool.p3.transformer.sample.LongRunningTransformer;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import eu.fusepool.p3.transformer.sample.SimpleAsyncTransformer;
