@@ -29,9 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Asynhronous Handlers and Factory is a bit tricky as the task page request
- * need to b sent to the right handler. As long as exactly one ASyncTransformer
- * is returned, things work.
+ * This tests a factory retuning and asynchronous transformer
  * 
  * @author Reto
  */

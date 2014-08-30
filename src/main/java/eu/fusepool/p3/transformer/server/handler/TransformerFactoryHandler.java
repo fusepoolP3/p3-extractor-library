@@ -15,11 +15,16 @@
  */
 package eu.fusepool.p3.transformer.server.handler;
 
+import eu.fusepool.p3.transformer.AsyncTransformer;
+import eu.fusepool.p3.transformer.LongRunningTransformerWrapper;
+import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,31 +39,81 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class TransformerFactoryHandler extends AbstractHandler {
 
     private final TransformerFactory factory;
-    private final Map<Transformer, Handler> transfomerHandlerMap = new HashMap<>();
-
+    private ASyncResponsesManager aSyncResponsesManager = new ASyncResponsesManager();
+    private final Map<String, AsyncTransformer> requestId2Transformer = new HashMap<>();
+    private final Set<AsyncTransformer> aSyncTransformerSet = new HashSet<>();
     public TransformerFactoryHandler(TransformerFactory factory) {
         this.factory = factory;
     }
-
+    
     @Override
-    public void handle(String target, Request baseRequest,
-            HttpServletRequest request, HttpServletResponse response)
+    public void handle(String target, Request baseRequest, 
+            HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {
-        final Transformer transformer = factory.getTransformer(request);
+        if (request.getMethod().equals("GET")) {
+            handleGet(request, response);
+            return;
+        }
+        if (request.getMethod().equals("POST")) {
+            handlePost(request, response);
+            return;
+        }
+        //TODO support at least HEAD
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    }
+
+    public void handlePost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+        final Transformer transformer = wrapLongRunning(factory.getTransformer(request));
         if (transformer == null) {
             response.sendError(404);
         } else {
-            Handler handler;
-            synchronized (this) {
-                if (transfomerHandlerMap.containsKey(transformer)) {
-                    handler = transfomerHandlerMap.get(transformer);
-                } else {
-                    handler = TransformerHandlerFactory.getTransformerHandler(transformer);
-                    transfomerHandlerMap.put(transformer, handler);
+            if (transformer instanceof SyncTransformer) {
+                new SyncTransformerHandler((SyncTransformer) transformer).handlePost(request, response);
+            } else {
+                final AsyncTransformer aSyncTransformer = (AsyncTransformer) transformer;
+                synchronized (aSyncTransformerSet) {
+                    if (!aSyncTransformerSet.contains(aSyncTransformer)) {
+                        aSyncTransformerSet.add(aSyncTransformer);
+                        aSyncTransformer.activate(aSyncResponsesManager);
+                    }
+                }
+                final String requestId = aSyncResponsesManager.handlePost(request, response, aSyncTransformer);
+                requestId2Transformer.put(requestId, aSyncTransformer);
+            }
+        }
+    }
+
+    private void handleGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String requestUri = request.getRequestURI();
+        if (requestUri.startsWith(ASyncResponsesManager.JOB_URI_PREFIX)) {
+            final AsyncTransformer transformer = requestId2Transformer.get(requestUri);
+            if (transformer == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                if (!aSyncResponsesManager.handleJobRequest(request, response, transformer)) {
+                    requestId2Transformer.remove(requestUri);
                 }
             }
-            handler.handle(target, baseRequest, request, response);
+        } else {
+            final Transformer transformer = factory.getTransformer(request);
+            if (transformer == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                AbstractTransformingHandler handler = TransformerHandlerFactory.getTransformerHandler(transformer);
+                handler.handleGet(request, response);
+            }
         }
+    }
+
+    private Transformer wrapLongRunning(Transformer transformer) {
+        if (transformer instanceof SyncTransformer) {
+            SyncTransformer syncTransformer = (SyncTransformer) transformer;
+            if (syncTransformer.isLongRunning()) {
+                return new LongRunningTransformerWrapper(syncTransformer);
+            }
+        } 
+        return transformer;
     }
 
 }

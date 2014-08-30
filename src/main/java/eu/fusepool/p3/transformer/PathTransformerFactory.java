@@ -37,10 +37,7 @@ public class PathTransformerFactory implements TransformerFactory {
         return pathTransformerMap.get(requestedPath);
     }
     
-    public void registerTransformer(String path, SyncTransformer transformer) {
-        if (transformer.isLongRunning()) {
-            throw new RuntimeException("Long Running Transformers are not currently supported");
-        }
+    public void registerTransformer(String path, Transformer transformer) {
         pathTransformerMap.put(path, transformer);
     }
     

@@ -52,7 +52,7 @@ public abstract class AbstractTransformingHandler extends AbstractHandler {
         response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    private String getFullRequestUrl(HttpServletRequest request) {
+    static String getFullRequestUrl(HttpServletRequest request) {
         StringBuffer requestURL = request.getRequestURL();
         if (request.getQueryString() != null) {
             requestURL.append("?").append(request.getQueryString());
@@ -72,7 +72,7 @@ public abstract class AbstractTransformingHandler extends AbstractHandler {
         respondFromNode(response, node);
     }
 
-    protected void respondFromNode(HttpServletResponse response, final GraphNode node) throws IOException, UnsupportedFormatException {
+    static void respondFromNode(HttpServletResponse response, final GraphNode node) throws IOException, UnsupportedFormatException {
         //TODO content negotiation
         final String responseFormat = SupportedFormat.TURTLE;
         response.setContentType(responseFormat);
@@ -84,7 +84,7 @@ public abstract class AbstractTransformingHandler extends AbstractHandler {
      * @param request
      * @return 
      */
-    protected GraphNode getServiceNode(HttpServletRequest request) {
+    static GraphNode getServiceNode(HttpServletRequest request) {
         final UriRef serviceUri = new UriRef(getFullRequestUrl(request));
         final MGraph resultGraph = new SimpleMGraph();
         return new GraphNode(serviceUri, resultGraph);
