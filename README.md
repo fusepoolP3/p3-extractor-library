@@ -6,14 +6,14 @@ in Java.
 
 It supports both the asynchronous and the asynchronous modes of the REST API.
 
-Implementations can either implement the `eu.fusepool.transformer.SyncTransformer` or
-`eu.fusepool.transformer.AsyncTransformer` interface. The `SyncTransformer` provides a
+Implementations can either implement the `eu.fusepool.p3.transformer.SyncTransformer` or
+`eu.fusepool.p3.transformer.AsyncTransformer` interface. The `SyncTransformer` provides a
 very simple API and has also support for long-running tasks that will be exposed 
 over the Asynchronous REST Interface.
 
 
 Minimalistic sample transformers are contained in the package 
-`eu.fusepool.transformer.sample`. The package also contains an executable main 
+`eu.fusepool.p3.transformer.sample`. The package also contains an executable main 
 class.
 
 Compile and run (the sample main class) with
