@@ -15,13 +15,22 @@
  */
 package eu.fusepool.p3.transformer.tests;
 
-import eu.fusepool.p3.transformer.sample.SimpleTransformer;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
+import eu.fusepool.p3.transformer.sample.SimpleTransformer;
 import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.net.ServerSocket;
+import java.util.Iterator;
+import org.apache.clerezza.rdf.core.BNode;
+import org.apache.clerezza.rdf.core.Graph;
+import org.apache.clerezza.rdf.core.Resource;
+import org.apache.clerezza.rdf.core.Triple;
+import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.rdf.core.serializedform.Parser;
+import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.http.HttpStatus;
 import org.hamcrest.core.StringContains;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,6 +62,12 @@ public class SynRestApiTest {
                 .content("hello")
                 .expect().statusCode(HttpStatus.SC_OK).content(new StringContains("hello")).header("Content-Type", "text/turtle").when()
                 .post();
+        Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
+        Iterator<Triple> typeTriples = graph.filter(null, RDF.type, 
+                new UriRef("http://example.org/ontology#TextDescription"));
+        Assert.assertTrue("No type triple found", typeTriples.hasNext());
+        Resource textDescription = typeTriples.next().getSubject();
+        Assert.assertTrue("TextDescription resource is not a BNode", textDescription instanceof BNode);
     }
 
     public static int findFreePort() {

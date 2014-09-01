@@ -156,6 +156,13 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.clerezza</groupId>
+            <artifactId>rdf.jena.parser</artifactId>
+            <version>0.12</version>
+            <!-- only in tests and only at runtime -->
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
