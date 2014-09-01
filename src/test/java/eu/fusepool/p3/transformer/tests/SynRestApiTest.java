@@ -64,10 +64,28 @@ public class SynRestApiTest {
                 .post();
         Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
         Iterator<Triple> typeTriples = graph.filter(null, RDF.type, 
-                new UriRef("http://example.org/ontology#TextDescription"));
+                SimpleTransformer.TEXUAL_CONTENT);
         Assert.assertTrue("No type triple found", typeTriples.hasNext());
         Resource textDescription = typeTriples.next().getSubject();
         Assert.assertTrue("TextDescription resource is not a BNode", textDescription instanceof BNode);
+    }
+    
+    @Test
+    public void turtlePostWithContentLocation() {
+        final String contentUri = "http://exaple.org/content";
+        Response response = RestAssured.given().header("Accept", "text/turtle")
+                .contentType("text/plain;charset=UTF-8")
+                .header("Content-Location", contentUri)
+                .content("hello")
+                .expect().statusCode(HttpStatus.SC_OK).content(new StringContains("hello")).header("Content-Type", "text/turtle").when()
+                .post();
+        Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
+        Iterator<Triple> typeTriples = graph.filter(null, RDF.type, 
+                SimpleTransformer.TEXUAL_CONTENT);
+        Assert.assertTrue("No type triple found", typeTriples.hasNext());
+        Resource textDescription = typeTriples.next().getSubject();
+        Assert.assertTrue("TextDescription resource is not a UriRef", textDescription instanceof UriRef);
+        Assert.assertEquals("Resource doesn't have the right URI", contentUri, ((UriRef)textDescription).getUnicodeString());
     }
 
     public static int findFreePort() {

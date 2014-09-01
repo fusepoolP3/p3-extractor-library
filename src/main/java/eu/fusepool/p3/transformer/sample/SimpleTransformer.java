@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import org.apache.clerezza.rdf.core.BNode;
+import org.apache.clerezza.rdf.core.Resource;
 import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
@@ -34,6 +35,8 @@ import org.apache.commons.io.IOUtils;
 
 
 public class SimpleTransformer extends RdfGeneratingTransformer {
+    
+    public static final UriRef TEXUAL_CONTENT = new UriRef("http://example.org/ontology#TextualContent");
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {
@@ -49,8 +52,11 @@ public class SimpleTransformer extends RdfGeneratingTransformer {
     protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
         final String text = IOUtils.toString(entity.getData(), "UTF-8");
         final TripleCollection result = new SimpleMGraph();
-        final GraphNode node = new GraphNode(new BNode(), result);
-        node.addProperty(RDF.type, new UriRef("http://example.org/ontology#TextDescription"));
+        final Resource resource = entity.getContentLocation() == null?
+                new BNode() :
+                new UriRef(entity.getContentLocation().toString());
+        final GraphNode node = new GraphNode(resource, result);
+        node.addProperty(RDF.type, TEXUAL_CONTENT);
         node.addPropertyValue(SIOC.content, text);
         node.addPropertyValue(new UriRef("http://example.org/ontology#textLength"), text.length());
         return result;
