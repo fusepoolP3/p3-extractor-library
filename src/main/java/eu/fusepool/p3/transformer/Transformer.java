@@ -20,7 +20,9 @@ import java.util.Set;
 import javax.activation.MimeType;
 
 /**
- *
+ * The super interface of the two transformer types. Implementations should
+ * always implement either {@link SyncTransformer} or {@link AsyncTransformer}.
+ * 
  * @author reto
  */
 public interface Transformer {

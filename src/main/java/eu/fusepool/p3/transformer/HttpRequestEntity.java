@@ -23,7 +23,8 @@ import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- *
+ * An entity allowing access to the {@link HttpServletRequest} it originates from.
+ * 
  * @author reto
  */
 public class HttpRequestEntity extends InputStreamEntity {

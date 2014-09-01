@@ -18,7 +18,11 @@ import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
-
+/**
+ * This abstact class facilitates the development of transformers producing RDF.
+ * 
+ * @author reto
+ */
 public abstract class RdfGeneratingTransformer implements SyncTransformer {
 
     @Override
