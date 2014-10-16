@@ -21,14 +21,14 @@ import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -41,7 +41,8 @@ public class TransformerFactoryHandler extends AbstractHandler {
     private final TransformerFactory factory;
     private ASyncResponsesManager aSyncResponsesManager = new ASyncResponsesManager();
     private final Map<String, AsyncTransformer> requestId2Transformer = new HashMap<>();
-    private final Set<AsyncTransformer> aSyncTransformerSet = new HashSet<>();
+    private final Set<AsyncTransformer> aSyncTransformerSet = Collections.newSetFromMap(
+        new WeakHashMap<AsyncTransformer, Boolean>());
     public TransformerFactoryHandler(TransformerFactory factory) {
         this.factory = factory;
     }
