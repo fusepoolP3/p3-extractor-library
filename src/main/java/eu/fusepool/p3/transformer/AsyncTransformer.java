@@ -43,6 +43,17 @@ public interface AsyncTransformer extends Transformer {
 
     void activate(CallBackHandler callBackHandler);
     
+    /**
+     * Starts the transformation of an Entity. Implementation should return fast, 
+     * the actual transformation should be done in separate treads or processes.
+     * Once the transformation results are available the callBackHandler has to be be called.
+     * Note the HttpServletRequest might not be usable once the HTTP request already
+     * returned so implementations should access the required request values before returning.
+     * 
+     * @param entity
+     * @param requestId
+     * @throws IOException 
+     */
     void transform(HttpRequestEntity entity, String requestId) throws IOException;
     
     /**

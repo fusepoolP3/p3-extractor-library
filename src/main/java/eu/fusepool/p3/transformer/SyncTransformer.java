@@ -28,6 +28,15 @@ import java.io.IOException;
 public interface SyncTransformer extends Transformer {
 
 
+    /**
+     * Transforms an Entity. Note that even though this gets a HttpRequestEntity
+     * the HttpServletRequest might not be usable if the HTTP request already
+     * returned, which is the case for long running transformers.
+     * 
+     * @param entity the entity to be transformer
+     * @return the transformed entity
+     * @throws IOException thrown when problems occur reading of writing the entity
+     */
     Entity transform(HttpRequestEntity entity) throws IOException;
     
     /**
