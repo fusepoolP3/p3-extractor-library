@@ -23,21 +23,25 @@ import java.net.URISyntaxException;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
+
+import eu.fusepool.p3.transformer.util.AcceptHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An entity allowing access to the {@link HttpServletRequest} it originates from.
- * 
+ *
  * @author reto
  */
 public class HttpRequestEntity extends InputStreamEntity {
 
     private final HttpServletRequest request;
+    private final AcceptHeader acceptHeader;
     private static final Logger log = LoggerFactory.getLogger(HttpRequestEntity.class);
-    
+
     public HttpRequestEntity(HttpServletRequest request) {
         this.request = request;
+        this.acceptHeader = AcceptHeader.fromRequest(request);
     }
 
     @Override
@@ -55,7 +59,7 @@ public class HttpRequestEntity extends InputStreamEntity {
     }
 
     @Override
-    public URI getContentLocation() { 
+    public URI getContentLocation() {
         final String contentLocation = request.getHeader("Content-Location");
         if (contentLocation != null) {
             try {
@@ -66,23 +70,27 @@ public class HttpRequestEntity extends InputStreamEntity {
         }
         return null;
     }
-    
 
-    
-    
     @Override
     public InputStream getData() throws IOException {
         return request.getInputStream();
     }
 
     /**
-     * 
+     *
      * @return the underlying Servlet Request, need e.g. for content negotiation
      */
     public HttpServletRequest getRequest() {
         return request;
     }
-    
-    
+
+    /**
+     * @return the {@link AcceptHeader} associated to the request originating
+     * this {@link HttpRequestEntity}. If the request lacks an accept header,
+     * this will be {@link AcceptHeader#NULL_HEADER}.
+     */
+    public AcceptHeader getAcceptHeader() {
+        return acceptHeader;
+    }
 
 }
