@@ -45,7 +45,7 @@ public class AcceptHeader {
 
     private static final String RFC2616_HEADER = "Accept";
 
-    private static final String RFC2616_SEPARATOR = ",";
+    private static final String RFC2616_MEDIA_SEPARATOR = ",";
 
     /**
      * Constant representing a <code>null</code> accept header, which amounts to an accept header
@@ -104,7 +104,7 @@ public class AcceptHeader {
         }
 
         List<String> entries = new ArrayList<String>();
-        for (String entry : header.split(RFC2616_SEPARATOR)) {
+        for (String entry : header.split(RFC2616_MEDIA_SEPARATOR)) {
             entries.add(entry);
         }
 
