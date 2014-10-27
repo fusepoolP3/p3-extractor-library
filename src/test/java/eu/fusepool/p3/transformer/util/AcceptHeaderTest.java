@@ -16,19 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package eu.fusepool.p3.transformer.utils;
+package eu.fusepool.p3.transformer.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import eu.fusepool.p3.transformer.util.AcceptHeader;
+import eu.fusepool.p3.transformer.HttpRequestEntity;
 
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.activation.MimeType;
+import javax.servlet.http.HttpServletRequest;
 
 import static eu.fusepool.p3.transformer.util.MimeUtils.mimeType;
 
@@ -107,7 +106,7 @@ public class AcceptHeaderTest {
     }
 
     @Test
-    public void testBestFromSupported2() {
+    public void gettingBestFromSupported2() {
         List<String> entryStrings = new ArrayList<String>();
 
         entryStrings.add("image/*;q=0.1");
@@ -122,5 +121,72 @@ public class AcceptHeaderTest {
 
         AcceptHeader acceptHeader = new AcceptHeader(entryStrings);
         Assert.assertEquals("application/rdf+xml", acceptHeader.getPreferredAccept(supported).getBaseType());
+    }
+
+    @Test
+    public void preservesOrderForMultipleHeaders() {
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+
+        EasyMock.expect(request.getHeaders(AcceptHeader.RFC2616_HEADER))
+                .andReturn(new Vector<String>() {{
+                    add("text/*;q=0.5,image/*;q=0.3");
+                    add("text/html;q=1,image/png;q=0.4");
+                    add("*/*;q=0.1");
+                }}.elements())
+                .atLeastOnce();
+
+        EasyMock.replay(request);
+
+        HttpRequestEntity entity = new HttpRequestEntity(request);
+
+        // Order shouldn't change.
+        assertEntriesMatch(entity.getAcceptHeader(), "text/*", "image/*");
+
+        assertEntriesMatch(entity.getAcceptHeaders().get(1), "text/html", "image/png");
+
+        assertEntriesMatch(entity.getAcceptHeaders().get(2), "*/*");
+    }
+
+    @Test
+    public void mergingMultipleHeaders() {
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+
+        EasyMock.expect(request.getHeaders(AcceptHeader.RFC2616_HEADER))
+                .andReturn(new Vector<String>() {{
+                    add("text/*;q=0.5,image/*;q=0.3");
+                    add("text/html;q=1,image/png;q=0.4");
+                    add("*/*;q=0.1");
+                }}.elements())
+                .atLeastOnce();
+
+        EasyMock.replay(request);
+
+        AcceptHeader header = new HttpRequestEntity(request).getMergedHeader();
+
+        Set<MimeType> supported = new HashSet<MimeType>() {{
+            add(mimeType("application/rdf+xml"));
+        }};
+
+        Assert.assertEquals("application/rdf+xml", header.getPreferredAccept(supported).getBaseType());
+
+        supported.add(mimeType("image/gif"));
+        Assert.assertEquals("image/gif", header.getPreferredAccept(supported).getBaseType());
+
+        supported.add(mimeType("text/csv"));
+        Assert.assertEquals("text/csv", header.getPreferredAccept(supported).getBaseType());
+
+        supported.add(mimeType("text/html"));
+        Assert.assertEquals("text/html", header.getPreferredAccept(supported).getBaseType());
+    }
+
+    private void assertEntriesMatch(AcceptHeader header, String... types) {
+        List<AcceptHeader.AcceptHeaderEntry> entries = header.getEntries();
+        Set<String> typeSet = new HashSet<String>(Arrays.asList(types));
+
+        for(AcceptHeader.AcceptHeaderEntry entry : entries) {
+            Assert.assertTrue(typeSet.remove(entry.mediaType.getBaseType()));
+        }
+
+        Assert.assertEquals(0, typeSet.size());
     }
 }

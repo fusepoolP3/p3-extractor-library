@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package eu.fusepool.p3.transformer.utils;
+package eu.fusepool.p3.transformer.util;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import eu.fusepool.p3.transformer.util.MimeTypeComparator;
-import eu.fusepool.p3.transformer.util.MimeUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

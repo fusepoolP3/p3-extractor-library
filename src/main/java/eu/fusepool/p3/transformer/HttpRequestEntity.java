@@ -16,10 +16,14 @@
 package eu.fusepool.p3.transformer;
 
 import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,12 +40,12 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestEntity extends InputStreamEntity {
 
     private final HttpServletRequest request;
-    private final AcceptHeader acceptHeader;
+    private final List<AcceptHeader> acceptHeaders;
     private static final Logger log = LoggerFactory.getLogger(HttpRequestEntity.class);
 
     public HttpRequestEntity(HttpServletRequest request) {
         this.request = request;
-        this.acceptHeader = AcceptHeader.fromRequest(request);
+        this.acceptHeaders = Collections.unmodifiableList(AcceptHeader.fromRequest(request));
     }
 
     @Override
@@ -65,7 +69,7 @@ public class HttpRequestEntity extends InputStreamEntity {
             try {
                 return new URI(contentLocation);
             } catch (URISyntaxException ex) {
-                log.warn("Content-Location not a URI "+contentLocation, ex);
+                log.warn("Content-Location not a URI " + contentLocation, ex);
             }
         }
         return null;
@@ -77,7 +81,6 @@ public class HttpRequestEntity extends InputStreamEntity {
     }
 
     /**
-     *
      * @return the underlying Servlet Request, need e.g. for content negotiation
      */
     public HttpServletRequest getRequest() {
@@ -85,12 +88,32 @@ public class HttpRequestEntity extends InputStreamEntity {
     }
 
     /**
-     * @return the {@link AcceptHeader} associated to the request originating
+     * @return the first {@link AcceptHeader} associated to the request originating
      * this {@link HttpRequestEntity}. If the request lacks an accept header,
      * this will be {@link AcceptHeader#NULL_HEADER}.
      */
     public AcceptHeader getAcceptHeader() {
-        return acceptHeader;
+        return acceptHeaders.get(0);
+    }
+
+    /**
+     * @return a readonly list with all of the {@link AcceptHeader}s associated to the
+     * request originating this {@link HttpRequestEntity}. If the request lacks and accept
+     * header, the list will contain a single element -- {@link AcceptHeader#NULL_HEADER}.
+     */
+    public List<AcceptHeader> getAcceptHeaders() {
+        return acceptHeaders;
+    }
+
+    /**
+     * Utility method.
+     *
+     * @return a single {@link AcceptHeader} that is semantically equivalent (as per RFC2616)
+     * to the set of headers passed to this request. Generated with
+     * {@link AcceptHeader#fromHeaders(java.util.List)}.
+     */
+    public AcceptHeader getMergedHeader() {
+        return AcceptHeader.fromHeaders(acceptHeaders);
     }
 
 }
