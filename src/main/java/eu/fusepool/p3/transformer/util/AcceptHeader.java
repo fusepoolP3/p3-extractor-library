@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static eu.fusepool.p3.transformer.util.MimeUtils.isSameOrSubtype;
 import static eu.fusepool.p3.transformer.util.MimeUtils.mimeType;
 
 /**
@@ -43,21 +44,21 @@ public class AcceptHeader {
 
     private static final Logger logger = LoggerFactory.getLogger(AcceptHeader.class);
 
-    private static final String RFC2616_HEADER = "Accept";
+    public static final String RFC2616_HEADER = "Accept";
 
-    private static final String RFC2616_MEDIA_SEPARATOR = ",";
+    public static final String RFC2616_MEDIA_SEPARATOR = ",";
 
     /**
      * Constant representing a <code>null</code> accept header, which amounts to an accept header
      * containing only the wildcard mime type (*), and thus matching everything.
      */
-    public static final AcceptHeader NULL_HEADER = new AcceptHeader(null);
+    public static final AcceptHeader NULL_HEADER = new AcceptHeader(Collections.EMPTY_LIST);
 
-    static class AcceptHeaderEntry implements Comparable<AcceptHeaderEntry> {
+    public static class AcceptHeaderEntry implements Comparable<AcceptHeaderEntry> {
 
-        private MimeTypeComparator mediaTypeComparator = new MimeTypeComparator();
-        MimeType mediaType;
-        int quality; //from 0 to 1000
+        private final MimeTypeComparator mediaTypeComparator = new MimeTypeComparator();
+        final MimeType mediaType;
+        final int quality; //from 0 to 1000
 
         AcceptHeaderEntry(MimeType mediaType) {
             MimeTypeParameterList parametersWithoutQ = mediaType.getParameters();
@@ -89,23 +90,82 @@ public class AcceptHeader {
         public String toString() {
             return mediaType + " with q=" + quality + ";";
         }
+
     }
 
     /**
-     * Constructs an {@link AcceptHeader} from an {@link javax.servlet.http.HttpServletRequest}.
+     * Constructs an {@link AcceptHeader} array from an {@link javax.servlet.http.HttpServletRequest}.
+     * The array will contain as many elements as there are accept headers in the request.
      *
      * @param request the request to extract the {@link AcceptHeader} from.
-     * @return the request's {@link AcceptHeader}, {@link AcceptHeader#NULL_HEADER} if none is found.
+     *
+     * @return an array with all of the the request's {@link AcceptHeader}s or, in case the request
+     *         contains no accept headers, an array containing {@link AcceptHeader#NULL_HEADER}. This
+     *         is consistent with RFC2161 in that if the client omits the accept header, then it should
+     *         accept anything.
      */
-    public static AcceptHeader fromRequest(HttpServletRequest request) {
-        String header = request.getHeader(RFC2616_HEADER);
+    public static List<AcceptHeader> fromRequest(HttpServletRequest request) {
+        ArrayList<AcceptHeader> headers = new ArrayList<AcceptHeader>();
+        Enumeration<String> strHeaders = request.getHeaders(RFC2616_HEADER);
+        while (strHeaders.hasMoreElements()) {
+            headers.add(fromString(strHeaders.nextElement()));
+        }
+
+        if (headers.size() == 0) {
+            headers.add(NULL_HEADER);
+        }
+
+        return headers;
+    }
+
+    /**
+     * @return a new {@link AcceptHeader} from a RFC2161 media/quality list. Example:
+     * <code>
+     *      fromString("image/png;q=1.0,image/*;q=0.7,text/plain;q=0.5");
+     * </code>
+     */
+    public static AcceptHeader fromString(String header) {
         if (header == null) {
-            return NULL_HEADER;
+            throw new NullPointerException("Header string can't be null.");
         }
 
         List<String> entries = new ArrayList<String>();
         for (String entry : header.split(RFC2616_MEDIA_SEPARATOR)) {
             entries.add(entry);
+        }
+
+        return new AcceptHeader(entries);
+    }
+
+    /**
+     * Constructs an {@link AcceptHeader} that is equivalent to a set of headers passed
+     * as part of a single HTTP request.
+     *
+     * @param headers a collection of accept headers that are part of single request.
+     *
+     * @return an {@link AcceptHeader} that corresponds to the merge of all headers in
+     * the parameter list. Example:
+     *
+     * <code>
+     *     AcceptHeader merged = fromHeaders(fromString("text/html;q=1.0"),
+     *                                       fromString("image/png;q=0.5"));
+     * </code>
+     *
+     * is equivalent to:
+     *
+     * <code>
+     *     AcceptHeader merged = fromString("text/html;q=1.0,image/png;q=0.5");
+     * </code>
+     */
+    public static AcceptHeader fromHeaders(List<AcceptHeader> headers) {
+        if (headers.size() == 0) {
+            throw new IllegalArgumentException("Header list must contain at least one element.");
+        }
+
+        TreeSet<AcceptHeaderEntry> entries = new TreeSet<>();
+        for (AcceptHeader header : headers) {
+            // It's OK to do this as AcceptHeaderEntry is immutable.
+            entries.addAll(header.entries);
         }
 
         return new AcceptHeader(entries);
@@ -125,6 +185,10 @@ public class AcceptHeader {
                 }
             }
         }
+    }
+
+    protected AcceptHeader(TreeSet<AcceptHeaderEntry> entries) {
+        this.entries = entries;
     }
 
     /**
@@ -157,7 +221,7 @@ public class AcceptHeader {
      */
     public MimeType getPreferredAccept(Set<MimeType> supportedTypes) {
         // Starts from the highest.
-        for(AcceptHeaderEntry clientSupported : entries) {
+        for (AcceptHeaderEntry clientSupported : entries) {
             for (MimeType serverSupported : supportedTypes) {
                 if (isSameOrSubtype(serverSupported, clientSupported.mediaType)) {
                     return serverSupported;
@@ -190,24 +254,4 @@ public class AcceptHeader {
         return 0;
     }
 
-    /**
-     * @param t1
-     * @param t2
-     * @return true if t1 is the same or a subtype ot t2 such as when t1 is
-     * text/plain and t2 is text/*
-     */
-    private boolean isSameOrSubtype(MimeType t1, MimeType t2) {
-        String type1 = t1.getPrimaryType();
-        String subtype1 = t1.getSubType();
-        String type2 = t2.getPrimaryType();
-        String subtype2 = t2.getSubType();
-
-        if (type2.equals(MimeUtils.MIME_TYPE_WILDCARD) && subtype2.equals(MimeUtils.MIME_TYPE_WILDCARD)) {
-            return true;
-        } else if (type1.equalsIgnoreCase(type2) && subtype2.equals(MimeUtils.MIME_TYPE_WILDCARD)) {
-            return true;
-        } else {
-            return type1.equalsIgnoreCase(type2) && subtype1.equalsIgnoreCase(subtype2);
-        }
-    }
 }

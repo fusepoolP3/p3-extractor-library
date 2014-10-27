@@ -61,4 +61,24 @@ public class MimeUtils {
         }
     }
 
+    /**
+     * @param t1
+     * @param t2
+     * @return true if t1 is the same or a subtype ot t2 such as when t1 is
+     * text/plain and t2 is text/*
+     */
+    public static boolean isSameOrSubtype(MimeType t1, MimeType t2) {
+        String type1 = t1.getPrimaryType();
+        String subtype1 = t1.getSubType();
+        String type2 = t2.getPrimaryType();
+        String subtype2 = t2.getSubType();
+
+        if (type2.equals(MimeUtils.MIME_TYPE_WILDCARD) && subtype2.equals(MimeUtils.MIME_TYPE_WILDCARD)) {
+            return true;
+        } else if (type1.equalsIgnoreCase(type2) && subtype2.equals(MimeUtils.MIME_TYPE_WILDCARD)) {
+            return true;
+        } else {
+            return type1.equalsIgnoreCase(type2) && subtype1.equalsIgnoreCase(subtype2);
+        }
+    }
 }
