@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import javax.activation.MimeType;
 
 /**
@@ -33,6 +34,8 @@ import javax.activation.MimeType;
 public class PreReadEntity extends HttpRequestEntity {
     private final HttpRequestEntity wrapped;
     private final byte[] data;
+    private final MimeType type;
+    private final URI contentLocation;
 
     public PreReadEntity(HttpRequestEntity wrapped) throws IOException {
         super(wrapped.getRequest());
@@ -40,13 +43,20 @@ public class PreReadEntity extends HttpRequestEntity {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         wrapped.writeData(baos);
         this.data = baos.toByteArray();
+        type = wrapped.getType();
+        contentLocation = wrapped.getContentLocation();
     }
 
     @Override
     public MimeType getType() {
-        return wrapped.getType();
+        return type;
     }
 
+    @Override
+    public URI getContentLocation() {
+        return contentLocation;
+    }
+    
     @Override
     public InputStream getData() throws IOException {
         return new ByteArrayInputStream(data);
