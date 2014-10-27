@@ -19,7 +19,7 @@ package eu.fusepool.p3.transformer;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * A TransformerFactory returns a Transfomer based on the HttpServletRequest.
+ * A TransformerFactory returns a Transformer based on the HttpServletRequest.
  * Typically it will return different transformers depending on the
  * requested path.
  * 
@@ -27,6 +27,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface TransformerFactory {
     
+    /**
+     * Returns a transformer for a specific request.
+     * 
+     * @param request
+     * @return 
+     * @throws TransformerException when transformation is not possible for this request 
+     */
     Transformer getTransformer(HttpServletRequest request);
     
 }

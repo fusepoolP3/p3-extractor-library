@@ -87,6 +87,16 @@ public class SynRestApiTest {
         Assert.assertTrue("TextDescription resource is not a UriRef", textDescription instanceof UriRef);
         Assert.assertEquals("Resource doesn't have the right URI", contentUri, ((UriRef)textDescription).getUnicodeString());
     }
+    
+    @Test
+    public void badRequest() {
+        RestAssured.given().header("Accept", "text/turtle")
+                .contentType("text/plain;charset=UTF-8")
+                .content("Democracy for Hong Kong") 
+                .expect().statusCode(HttpStatus.SC_FORBIDDEN).when()
+                .post();
+        
+    }
 
     public static int findFreePort() {
         int port = 0;

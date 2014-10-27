@@ -18,8 +18,12 @@ package eu.fusepool.p3.transformer.sample;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.RdfGeneratingTransformer;
+import eu.fusepool.p3.transformer.TransformerException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -37,6 +41,7 @@ import org.apache.commons.io.IOUtils;
 public class SimpleTransformer extends RdfGeneratingTransformer {
     
     public static final UriRef TEXUAL_CONTENT = new UriRef("http://example.org/ontology#TextualContent");
+    private static final List<String> forbiddenStrings = Arrays.asList(new String[] {"Democracy for Hong Kong"});
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {
@@ -51,6 +56,9 @@ public class SimpleTransformer extends RdfGeneratingTransformer {
     @Override
     protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
         final String text = IOUtils.toString(entity.getData(), "UTF-8");
+        if (forbiddenStrings.contains(text)) {
+            throw new TransformerException(403, "fobidden!");
+        }
         final TripleCollection result = new SimpleMGraph();
         final Resource resource = entity.getContentLocation() == null?
                 new BNode() :
@@ -68,5 +76,5 @@ public class SimpleTransformer extends RdfGeneratingTransformer {
     }
 
 
-    
+
 }

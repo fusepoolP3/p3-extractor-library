@@ -36,6 +36,7 @@ public interface SyncTransformer extends Transformer {
      * @param entity the entity to be transformer
      * @return the transformed entity
      * @throws IOException thrown when problems occur reading of writing the entity
+     * @throws TransformerException when a transformation error occurs 
      */
     Entity transform(HttpRequestEntity entity) throws IOException;
     
