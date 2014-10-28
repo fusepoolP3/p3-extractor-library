@@ -16,6 +16,7 @@
 
 package eu.fusepool.p3.transformer;
 
+import eu.fusepool.p3.transformer.util.AcceptPreference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class PreReadEntity extends HttpRequestEntity {
     private final byte[] data;
     private final MimeType type;
     private final URI contentLocation;
+    private final AcceptPreference acceptPreference;
 
     public PreReadEntity(HttpRequestEntity wrapped) throws IOException {
         super(wrapped.getRequest());
@@ -45,6 +47,7 @@ public class PreReadEntity extends HttpRequestEntity {
         this.data = baos.toByteArray();
         type = wrapped.getType();
         contentLocation = wrapped.getContentLocation();
+        acceptPreference = super.getAcceptPreference();
     }
 
     @Override
@@ -55,6 +58,11 @@ public class PreReadEntity extends HttpRequestEntity {
     @Override
     public URI getContentLocation() {
         return contentLocation;
+    }
+
+    @Override
+    public AcceptPreference getAcceptPreference() {
+        return acceptPreference;
     }
     
     @Override

@@ -1,26 +1,20 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package eu.fusepool.p3.transformer.util;
 
 import java.util.*;
 
-import eu.fusepool.p3.transformer.HttpRequestEntity;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -31,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static eu.fusepool.p3.transformer.util.MimeUtils.mimeType;
 
-public class AcceptHeaderTest {
+public class AcceptPreferenceTest {
 
     @Test
     public void gettingQualityWithWildCard() {
@@ -42,7 +36,7 @@ public class AcceptHeaderTest {
         entryStrings.add("image/*;q=.3");
         entryStrings.add("text/*;q=.3");
 
-        AcceptHeader acceptHeader = new AcceptHeader(entryStrings);
+        AcceptPreference acceptHeader = new AcceptPreference(entryStrings);
 
         Assert.assertEquals(1000, acceptHeader.getAcceptedQuality(mimeType("image/jpeg")));
         Assert.assertEquals(1000, acceptHeader.getAcceptedQuality(mimeType("image/png")));
@@ -59,7 +53,7 @@ public class AcceptHeaderTest {
         entryStrings.add("image/*;q=.3");
         entryStrings.add("text/*;q=.3");
 
-        AcceptHeader acceptHeader = new AcceptHeader(entryStrings);
+        AcceptPreference acceptHeader = new AcceptPreference(entryStrings);
         Assert.assertEquals(1000, acceptHeader.getAcceptedQuality(mimeType("image/jpeg")));
         Assert.assertEquals(1000, acceptHeader.getAcceptedQuality(mimeType("image/png")));
         Assert.assertEquals(300, acceptHeader.getAcceptedQuality(mimeType("image/x-foo")));
@@ -75,7 +69,7 @@ public class AcceptHeaderTest {
         entryStrings.add("image/*;q=.3");
         entryStrings.add("text/*;q=.3");
 
-        AcceptHeader acceptHeader = new AcceptHeader(entryStrings);
+        AcceptPreference acceptHeader = new AcceptPreference(entryStrings);
         Assert.assertEquals("image/png", acceptHeader.getPreferredAccept().getBaseType());
     }
 
@@ -94,7 +88,7 @@ public class AcceptHeaderTest {
             add(mimeType("image/tif"));
         }};
 
-        AcceptHeader acceptHeader = new AcceptHeader(entryStrings);
+        AcceptPreference acceptHeader = new AcceptPreference(entryStrings);
         Assert.assertEquals("image/tif", acceptHeader.getPreferredAccept(supported).getBaseType());
 
         supported.add(mimeType("image/png"));
@@ -119,39 +113,15 @@ public class AcceptHeaderTest {
             add(mimeType("application/rdf+xml"));
         }};
 
-        AcceptHeader acceptHeader = new AcceptHeader(entryStrings);
+        AcceptPreference acceptHeader = new AcceptPreference(entryStrings);
         Assert.assertEquals("application/rdf+xml", acceptHeader.getPreferredAccept(supported).getBaseType());
-    }
-
-    @Test
-    public void preservesOrderForMultipleHeaders() {
-        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
-
-        EasyMock.expect(request.getHeaders(AcceptHeader.RFC2616_HEADER))
-                .andReturn(new Vector<String>() {{
-                    add("text/*;q=0.5,image/*;q=0.3");
-                    add("text/html;q=1,image/png;q=0.4");
-                    add("*/*;q=0.1");
-                }}.elements())
-                .atLeastOnce();
-
-        EasyMock.replay(request);
-
-        HttpRequestEntity entity = new HttpRequestEntity(request);
-
-        // Order shouldn't change.
-        assertEntriesMatch(entity.getAcceptHeader(), "text/*", "image/*");
-
-        assertEntriesMatch(entity.getAcceptHeaders().get(1), "text/html", "image/png");
-
-        assertEntriesMatch(entity.getAcceptHeaders().get(2), "*/*");
     }
 
     @Test
     public void mergingMultipleHeaders() {
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
 
-        EasyMock.expect(request.getHeaders(AcceptHeader.RFC2616_HEADER))
+        EasyMock.expect(request.getHeaders(AcceptPreference.RFC7231_HEADER))
                 .andReturn(new Vector<String>() {{
                     add("text/*;q=0.5,image/*;q=0.3");
                     add("text/html;q=1,image/png;q=0.4");
@@ -161,29 +131,31 @@ public class AcceptHeaderTest {
 
         EasyMock.replay(request);
 
-        AcceptHeader header = new HttpRequestEntity(request).getMergedAcceptHeader();
+        AcceptPreference acceptPreference = AcceptPreference.fromRequest(request);
 
+        assertEntriesMatch(acceptPreference, "text/*", "image/*", "text/html", "image/png","*/*");
+        
         Set<MimeType> supported = new HashSet<MimeType>() {{
             add(mimeType("application/rdf+xml"));
         }};
 
-        Assert.assertEquals("application/rdf+xml", header.getPreferredAccept(supported).getBaseType());
+        Assert.assertEquals("application/rdf+xml", acceptPreference.getPreferredAccept(supported).getBaseType());
 
         supported.add(mimeType("image/gif"));
-        Assert.assertEquals("image/gif", header.getPreferredAccept(supported).getBaseType());
+        Assert.assertEquals("image/gif", acceptPreference.getPreferredAccept(supported).getBaseType());
 
         supported.add(mimeType("text/csv"));
-        Assert.assertEquals("text/csv", header.getPreferredAccept(supported).getBaseType());
+        Assert.assertEquals("text/csv", acceptPreference.getPreferredAccept(supported).getBaseType());
 
         supported.add(mimeType("text/html"));
-        Assert.assertEquals("text/html", header.getPreferredAccept(supported).getBaseType());
+        Assert.assertEquals("text/html", acceptPreference.getPreferredAccept(supported).getBaseType());
     }
 
-    private void assertEntriesMatch(AcceptHeader header, String... types) {
-        List<AcceptHeader.AcceptHeaderEntry> entries = header.getEntries();
+    private void assertEntriesMatch(AcceptPreference header, String... types) {
+        List<AcceptPreference.AcceptHeaderEntry> entries = header.getEntries();
         Set<String> typeSet = new HashSet<String>(Arrays.asList(types));
 
-        for(AcceptHeader.AcceptHeaderEntry entry : entries) {
+        for(AcceptPreference.AcceptHeaderEntry entry : entries) {
             Assert.assertTrue(typeSet.remove(entry.mediaType.getBaseType()));
         }
 

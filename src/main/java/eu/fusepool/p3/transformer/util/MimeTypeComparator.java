@@ -60,12 +60,12 @@ public class MimeTypeComparator implements Comparator<MimeType> {
         }
     }
 
-    private AcceptHeader acceptHeader;
+    private AcceptPreference acceptHeader;
 
     public MimeTypeComparator() {
     }
 
-    public MimeTypeComparator(AcceptHeader acceptHeader) {
+    public MimeTypeComparator(AcceptPreference acceptHeader) {
         this.acceptHeader = acceptHeader;
     }
 

@@ -1,20 +1,15 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package eu.fusepool.p3.transformer.util;
 
@@ -32,27 +27,20 @@ import static eu.fusepool.p3.transformer.util.MimeUtils.isSameOrSubtype;
 import static eu.fusepool.p3.transformer.util.MimeUtils.mimeType;
 
 /**
+ * This class represents the media-type acceptance preference as expressed by
+ * the values of HTTP Accept headers,
+ * 
  * @author reto
  * @author Giuliano Mega
  */
-public class AcceptHeader {
+public class AcceptPreference {
 
-    @Override
-    public String toString() {
-        return entries.toString();
-    }
+    private static final Logger logger = LoggerFactory.getLogger(AcceptPreference.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(AcceptHeader.class);
+    public static final String RFC7231_HEADER = "Accept";
 
-    public static final String RFC2616_HEADER = "Accept";
+    public static final String RFC7231_MEDIA_SEPARATOR = ",";
 
-    public static final String RFC2616_MEDIA_SEPARATOR = ",";
-
-    /**
-     * Constant representing a <code>null</code> accept header, which amounts to an accept header
-     * containing only the wildcard mime type (*), and thus matching everything.
-     */
-    public static final AcceptHeader NULL_HEADER = new AcceptHeader(Collections.EMPTY_LIST);
 
     public static class AcceptHeaderEntry implements Comparable<AcceptHeaderEntry> {
 
@@ -94,86 +82,83 @@ public class AcceptHeader {
     }
 
     /**
-     * Constructs an {@link AcceptHeader} array from an {@link javax.servlet.http.HttpServletRequest}.
-     * The array will contain as many elements as there are accept headers in the request.
+     * Constructs an {@link AcceptPreference} array from an {@link javax.servlet.http.HttpServletRequest}.
      *
-     * @param request the request to extract the {@link AcceptHeader} from.
-     *
-     * @return an array with all of the the request's {@link AcceptHeader}s or, in case the request
-     *         contains no accept headers, an array containing {@link AcceptHeader#NULL_HEADER}. This
-     *         is consistent with RFC2161 in that if the client omits the accept header, then it should
-     *         accept anything.
+     * @param request the request to extract the {@link AcceptPreference} from.
+     * @return the {@link AcceptPreference}s reflecting all Accept-Headers in 
+     *         the request, in case the request contains no header an 
+     *         AcceptPreference quivalent to a single "*&#47;*" header value is returned.
      */
-    public static List<AcceptHeader> fromRequest(HttpServletRequest request) {
-        ArrayList<AcceptHeader> headers = new ArrayList<AcceptHeader>();
-        Enumeration<String> strHeaders = request.getHeaders(RFC2616_HEADER);
+    public static AcceptPreference fromRequest(HttpServletRequest request) {
+        ArrayList<AcceptPreference> headers = new ArrayList<AcceptPreference>();
+        Enumeration<String> strHeaders = request.getHeaders(RFC7231_HEADER);
         while (strHeaders.hasMoreElements()) {
             headers.add(fromString(strHeaders.nextElement()));
         }
-
-        if (headers.size() == 0) {
-            headers.add(NULL_HEADER);
+        if (headers.isEmpty()) {
+            return fromString("*/*");
+        } else {
+            return fromHeaders(headers);
         }
-
-        return headers;
     }
 
     /**
-     * @return a new {@link AcceptHeader} from a RFC2161 media/quality list. Example:
+     * @return a new {@link AcceptPreference} from a RFC7231 media/quality list. Example:
      * <code>
      *      fromString("image/png;q=1.0,image/*;q=0.7,text/plain;q=0.5");
      * </code>
      */
-    public static AcceptHeader fromString(String header) {
+    public static AcceptPreference fromString(String header) {
         if (header == null) {
             throw new NullPointerException("Header string can't be null.");
         }
 
         List<String> entries = new ArrayList<String>();
-        for (String entry : header.split(RFC2616_MEDIA_SEPARATOR)) {
+        for (String entry : header.split(RFC7231_MEDIA_SEPARATOR)) {
             entries.add(entry);
         }
 
-        return new AcceptHeader(entries);
+        return new AcceptPreference(entries);
     }
 
     /**
-     * Constructs an {@link AcceptHeader} that is equivalent to a set of headers passed
-     * as part of a single HTTP request.
+     * Constructs an {@link AcceptPreference} that is equivalent to 
+     * the union of the <code>AcceptPreference</code>s passed as argument.
      *
      * @param headers a collection of accept headers that are part of single request.
      *
-     * @return an {@link AcceptHeader} that corresponds to the merge of all headers in
+     * @return an {@link AcceptPreference} that corresponds to the merge of all headers in
      * the parameter list. Example:
      *
      * <code>
-     *     AcceptHeader merged = fromHeaders(fromString("text/html;q=1.0"),
-     *                                       fromString("image/png;q=0.5"));
-     * </code>
+     AcceptPreference merged = fromHeaders(fromString("text/html;q=1.0"),
+                                       fromString("image/png;q=0.5"));
+ </code>
      *
      * is equivalent to:
      *
      * <code>
-     *     AcceptHeader merged = fromString("text/html;q=1.0,image/png;q=0.5");
-     * </code>
+     AcceptPreference merged = fromString("text/html;q=1.0,image/png;q=0.5");
+ </code>
      */
-    public static AcceptHeader fromHeaders(List<AcceptHeader> headers) {
-        if (headers.size() == 0) {
+    public static AcceptPreference fromHeaders(Collection<AcceptPreference> headers) {
+        if (headers.isEmpty()) {
             throw new IllegalArgumentException("Header list must contain at least one element.");
         }
 
         TreeSet<AcceptHeaderEntry> entries = new TreeSet<>();
-        for (AcceptHeader header : headers) {
+        for (AcceptPreference header : headers) {
             // It's OK to do this as AcceptHeaderEntry is immutable.
             entries.addAll(header.entries);
         }
 
-        return new AcceptHeader(entries);
+        return new AcceptPreference(entries);
     }
 
-    private TreeSet<AcceptHeaderEntry> entries = new TreeSet<AcceptHeaderEntry>();
+    private final TreeSet<AcceptHeaderEntry> entries;
 
-    public AcceptHeader(List<String> entryStrings) {
+    protected AcceptPreference(List<String> entryStrings) {
+        entries = new TreeSet<AcceptHeaderEntry>();
         if ((entryStrings == null) || (entryStrings.size() == 0)) {
             entries.add(new AcceptHeaderEntry(MimeUtils.WILDCARD_TYPE));
         } else {
@@ -187,13 +172,13 @@ public class AcceptHeader {
         }
     }
 
-    protected AcceptHeader(TreeSet<AcceptHeaderEntry> entries) {
+    protected AcceptPreference(TreeSet<AcceptHeaderEntry> entries) {
         this.entries = entries;
     }
 
     /**
      * @return a sorted list of the {@link AcceptHeaderEntry} that compose this
-     * {@link AcceptHeader}.
+     * {@link AcceptPreference}.
      */
     public List<AcceptHeaderEntry> getEntries() {
         List<AcceptHeaderEntry> result = new ArrayList<AcceptHeaderEntry>();
@@ -205,7 +190,7 @@ public class AcceptHeader {
 
     /**
      * @return the {@link MimeType} with the highest quality parameter amongst the ones
-     * specified in this {@link AcceptHeader}.
+     * specified in this {@link AcceptPreference}.
      */
     public MimeType getPreferredAccept() {
         return entries.pollFirst().mediaType;
@@ -252,6 +237,11 @@ public class AcceptHeader {
         }
 
         return 0;
+    }
+    
+    @Override
+    public String toString() {
+        return entries.toString();
     }
 
 }
