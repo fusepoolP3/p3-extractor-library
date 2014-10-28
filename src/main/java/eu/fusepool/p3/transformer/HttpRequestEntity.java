@@ -16,6 +16,7 @@
 package eu.fusepool.p3.transformer;
 
 import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -23,19 +24,21 @@ import java.net.URISyntaxException;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
+
+import eu.fusepool.p3.transformer.util.AcceptPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An entity allowing access to the {@link HttpServletRequest} it originates from.
- * 
+ *
  * @author reto
  */
 public class HttpRequestEntity extends InputStreamEntity {
 
     private final HttpServletRequest request;
     private static final Logger log = LoggerFactory.getLogger(HttpRequestEntity.class);
-    
+
     public HttpRequestEntity(HttpServletRequest request) {
         this.request = request;
     }
@@ -55,34 +58,45 @@ public class HttpRequestEntity extends InputStreamEntity {
     }
 
     @Override
-    public URI getContentLocation() { 
+    public URI getContentLocation() {
         final String contentLocation = request.getHeader("Content-Location");
         if (contentLocation != null) {
             try {
                 return new URI(contentLocation);
             } catch (URISyntaxException ex) {
-                log.warn("Content-Location not a URI "+contentLocation, ex);
+                log.warn("Content-Location not a URI " + contentLocation, ex);
             }
         }
         return null;
     }
-    
 
-    
-    
     @Override
     public InputStream getData() throws IOException {
         return request.getInputStream();
     }
 
     /**
-     * 
      * @return the underlying Servlet Request, need e.g. for content negotiation
      */
     public HttpServletRequest getRequest() {
         return request;
     }
-    
-    
+
+    /**
+     * @return the {@link AcceptPreference} associated to the request originating
+     * this {@link HttpRequestEntity}.
+     */
+    public AcceptPreference getAcceptPreference() {
+        return AcceptPreference.fromRequest(request);
+    }
+
+
+    /**
+     * @return the {@link MimeType} with the highest quality parameter amongst the ones
+     * specified in the {@link AcceptPreference}. Shortcut for <code>getAcceptPreference().getPreferredAccept()</code>
+     */
+    public MimeType getPreferredAccept() {
+        return getAcceptPreference().getPreferredAccept();
+    }
 
 }
