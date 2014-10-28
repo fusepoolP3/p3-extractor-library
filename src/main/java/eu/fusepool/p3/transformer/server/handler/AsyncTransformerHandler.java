@@ -16,9 +16,8 @@
 package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.AsyncTransformer;
-import eu.fusepool.p3.transformer.HttpRequestEntity;
+import eu.fusepool.p3.transformer.TransformerException;
 import java.io.IOException;
-import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +39,12 @@ class AsyncTransformerHandler extends TransformerHandler  {
 
     @Override
     protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-        aSyncResponsesManager.handlePost(request, response, transformer);
+        try {
+            aSyncResponsesManager.handlePost(request, response, transformer);
+        } catch (TransformerException e) {
+            response.setStatus(e.getStatusCode());
+            writeResponse(e.getResponseEntity(), response);
+        }
     }
 
     @Override

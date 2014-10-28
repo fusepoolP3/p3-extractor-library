@@ -16,10 +16,14 @@
 package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.AsyncTransformer;
+import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.LongRunningTransformerWrapper;
 import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.Transformer;
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.TransformerFactory;
+import eu.fusepool.p3.transformer.commons.Entity;
+import static eu.fusepool.p3.transformer.server.handler.TransformerHandler.writeResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +69,7 @@ public class TransformerFactoryHandler extends AbstractHandler {
 
     public void handlePost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        final Transformer transformer = wrapLongRunning(factory.getTransformer(request));
+        final Transformer transformer = wrapLongRunning(getTransformer(request, response));
         if (transformer == null) {
             response.sendError(404);
         } else {
@@ -97,7 +101,7 @@ public class TransformerFactoryHandler extends AbstractHandler {
                 }
             }
         } else {
-            final Transformer transformer = factory.getTransformer(request);
+            final Transformer transformer = getTransformer(request, response);
             if (transformer == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             } else {
@@ -105,6 +109,16 @@ public class TransformerFactoryHandler extends AbstractHandler {
                 handler.handleGet(request, response);
             }
         }
+    }
+    
+    private Transformer getTransformer(HttpServletRequest request, HttpServletResponse response) throws IOException {
+         try {
+            return factory.getTransformer(request);
+        } catch (TransformerException e) {
+            response.setStatus(e.getStatusCode());
+            writeResponse(e.getResponseEntity(), response);
+            throw e;
+        }      
     }
 
     private Transformer wrapLongRunning(Transformer transformer) {

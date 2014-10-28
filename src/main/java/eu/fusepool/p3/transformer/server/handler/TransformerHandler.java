@@ -17,8 +17,13 @@
 package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.Transformer;
+import eu.fusepool.p3.transformer.TransformerException;
+import eu.fusepool.p3.transformer.commons.Entity;
+import java.io.IOException;
 import java.util.Set;
 import javax.activation.MimeType;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -39,6 +44,23 @@ abstract class TransformerHandler extends AbstractTransformingHandler {
     @Override
     protected Set<MimeType> getSupportedOutputFormats() {
         return transformer.getSupportedOutputFormats();
+    }
+
+    @Override
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            super.handleGet(request, response); 
+        } catch (TransformerException e) {
+            response.setStatus(e.getStatusCode());
+            writeResponse(e.getResponseEntity(), response);
+        }
+    }
+    
+    
+    static void writeResponse(Entity responseEntity, HttpServletResponse response) throws IOException {
+        response.setContentType(responseEntity.getType().toString());
+        responseEntity.writeData(response.getOutputStream());
+        response.getOutputStream().flush();
     }
     
 }

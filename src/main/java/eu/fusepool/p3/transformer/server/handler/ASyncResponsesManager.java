@@ -17,6 +17,7 @@ package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.AsyncTransformer;
 import eu.fusepool.p3.transformer.HttpRequestEntity;
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;
@@ -65,6 +66,11 @@ public class ASyncResponsesManager implements AsyncTransformer.CallBackHandler {
             return true;
         }
         if (requestResult.exception != null) {
+            if (requestResult.exception instanceof TransformerException) {
+                TransformerException te = (TransformerException) requestResult.exception;
+                response.setStatus(te.getStatusCode());
+                TransformerHandler.writeResponse(te.getResponseEntity(), response);
+            }
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             PrintWriter out = response.getWriter();
             requestResult.exception.printStackTrace(out);

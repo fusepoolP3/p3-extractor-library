@@ -53,6 +53,7 @@ public interface AsyncTransformer extends Transformer {
      * @param entity
      * @param requestId
      * @throws IOException 
+     * @throws TransformerException when a transformation error occurs 
      */
     void transform(HttpRequestEntity entity, String requestId) throws IOException;
     

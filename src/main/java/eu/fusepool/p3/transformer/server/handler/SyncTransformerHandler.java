@@ -17,7 +17,9 @@ package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.SyncTransformer;
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.commons.Entity;
+import static eu.fusepool.p3.transformer.server.handler.TransformerHandler.writeResponse;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,10 +40,13 @@ class SyncTransformerHandler extends TransformerHandler {
 
     @Override
     protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
-        Entity responseEntity = transformer.transform(new HttpRequestEntity(request));
-        response.setContentType(responseEntity.getType().toString());
-        responseEntity.writeData(response.getOutputStream());
-        response.getOutputStream().flush();
+        try {
+            Entity responseEntity = transformer.transform(new HttpRequestEntity(request));
+            writeResponse(responseEntity, response); 
+        } catch (TransformerException e) {
+            response.setStatus(e.getStatusCode());
+            writeResponse(e.getResponseEntity(), response);
+        }        
     }
 
 }
