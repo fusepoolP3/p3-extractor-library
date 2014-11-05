@@ -73,8 +73,8 @@ public abstract class RdfGeneratingTransformer implements SyncTransformer {
      * the HttpServletRequest might not be usable if the HTTP request already
      * returned, which is the case for long running transformers.
      * 
-     * @param entity
-     * @return
+     * @param entity the entity to be transformed
+     * @return the graph resulting from the transformation
      * @throws IOException 
      */
     protected abstract TripleCollection generateRdf(HttpRequestEntity entity) throws IOException;

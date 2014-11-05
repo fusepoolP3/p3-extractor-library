@@ -82,7 +82,7 @@ public abstract class AbstractTransformingHandler extends AbstractHandler {
     /**
      * Returns a GraphNode representing the requested resources in an empty MGraph
      * @param request
-     * @return 
+     * @return a GraphNode representing the resource
      */
     static GraphNode getServiceNode(HttpServletRequest request) {
         final UriRef serviceUri = new UriRef(getFullRequestUrl(request));

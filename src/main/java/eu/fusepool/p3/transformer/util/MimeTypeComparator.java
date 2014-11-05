@@ -74,7 +74,7 @@ public class MimeTypeComparator implements Comparator<MimeType> {
      *
      * @param o1
      * @param o2
-     * @return
+     * @return a negative value if the quality of o1 is higher, a positive when it is lower, 0 otherwise
      */
     public static int inconsistentCompare(MimeType o1, MimeType o2) {
         if ((o1 == null) && (o2 == null)) {

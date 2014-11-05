@@ -31,7 +31,7 @@ public interface TransformerFactory {
      * Returns a transformer for a specific request.
      * 
      * @param request
-     * @return 
+     * @return the transformer to be used for this request
      * @throws TransformerException when transformation is not possible for this request 
      */
     Transformer getTransformer(HttpServletRequest request);
