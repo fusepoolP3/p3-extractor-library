@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package eu.fusepool.p3.transformer.server.handler;
 
-import eu.fusepool.p3.transformer.HttpRequestEntity;
-import eu.fusepool.p3.transformer.SyncTransformer;
+import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.commons.Entity;
-import static eu.fusepool.p3.transformer.server.handler.TransformerHandler.writeResponse;
 import java.io.IOException;
-import javax.servlet.ServletException;
+import java.util.Set;
+import javax.activation.MimeType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,24 +29,38 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author reto
  */
-class SyncTransformerHandler extends TransformerHandler {
+abstract class TransformerServlet extends AbstractTransformingServlet {
+    private final Transformer transformer;
 
-    private SyncTransformer transformer;
-
-    SyncTransformerHandler(SyncTransformer transformer) {
-        super(transformer);
+    public TransformerServlet(Transformer transformer) {
         this.transformer = transformer;
     }
 
     @Override
-    protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+    protected Set<MimeType> getSupportedInputFormats() {
+        return transformer.getSupportedInputFormats();
+    }
+
+    @Override
+    protected Set<MimeType> getSupportedOutputFormats() {
+        return transformer.getSupportedOutputFormats();
+    }
+
+    @Override
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            Entity responseEntity = transformer.transform(new HttpRequestEntity(request));
-            writeResponse(responseEntity, response); 
+            super.handleGet(request, response); 
         } catch (TransformerException e) {
             response.setStatus(e.getStatusCode());
             writeResponse(e.getResponseEntity(), response);
-        }        
+        }
     }
-
+    
+    
+    static void writeResponse(Entity responseEntity, HttpServletResponse response) throws IOException {
+        response.setContentType(responseEntity.getType().toString());
+        responseEntity.writeData(response.getOutputStream());
+        response.getOutputStream().flush();
+    }
+    
 }

@@ -16,14 +16,12 @@
 package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.transformer.AsyncTransformer;
-import eu.fusepool.p3.transformer.HttpRequestEntity;
 import eu.fusepool.p3.transformer.LongRunningTransformerWrapper;
 import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.TransformerFactory;
-import eu.fusepool.p3.transformer.commons.Entity;
-import static eu.fusepool.p3.transformer.server.handler.TransformerHandler.writeResponse;
+import static eu.fusepool.p3.transformer.server.handler.TransformerServlet.writeResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,30 +29,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 
 /**
  *
  * @author reto
  */
-public class TransformerFactoryHandler extends AbstractHandler {
+public class TransformerFactoryServlet extends HttpServlet {
 
     private final TransformerFactory factory;
     private ASyncResponsesManager aSyncResponsesManager = new ASyncResponsesManager();
     private final Map<String, AsyncTransformer> requestId2Transformer = new HashMap<>();
     private final Set<AsyncTransformer> aSyncTransformerSet = Collections.newSetFromMap(
         new WeakHashMap<AsyncTransformer, Boolean>());
-    public TransformerFactoryHandler(TransformerFactory factory) {
+    public TransformerFactoryServlet(TransformerFactory factory) {
         this.factory = factory;
     }
-    
+
     @Override
-    public void handle(String target, Request baseRequest, 
-            HttpServletRequest request, HttpServletResponse response) 
-            throws IOException, ServletException {
+    protected void service(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         if (request.getMethod().equals("GET")) {
             handleGet(request, response);
             return;
@@ -74,7 +70,7 @@ public class TransformerFactoryHandler extends AbstractHandler {
             response.sendError(404);
         } else {
             if (transformer instanceof SyncTransformer) {
-                new SyncTransformerHandler((SyncTransformer) transformer).handlePost(request, response);
+                new SyncTransformerServlet((SyncTransformer) transformer).handlePost(request, response);
             } else {
                 final AsyncTransformer aSyncTransformer = (AsyncTransformer) transformer;
                 synchronized (aSyncTransformerSet) {
@@ -105,7 +101,7 @@ public class TransformerFactoryHandler extends AbstractHandler {
             if (transformer == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             } else {
-                AbstractTransformingHandler handler = TransformerHandlerFactory.getTransformerHandler(transformer);
+                AbstractTransformingServlet handler = TransformerHandlerFactory.getTransformerHandler(transformer);
                 handler.handleGet(request, response);
             }
         }

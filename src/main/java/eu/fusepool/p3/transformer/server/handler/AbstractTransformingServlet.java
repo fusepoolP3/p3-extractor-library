@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.clerezza.rdf.core.MGraph;
@@ -19,8 +20,6 @@ import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.apache.clerezza.rdf.core.serializedform.UnsupportedFormatException;
 import org.apache.clerezza.rdf.utils.GraphNode;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 
 
 /**
@@ -31,15 +30,14 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
  * 
  * @author reto
  */
-public abstract class AbstractTransformingHandler extends AbstractHandler {
+public abstract class AbstractTransformingServlet extends HttpServlet {
 
     protected abstract Set<MimeType> getSupportedInputFormats();
     protected abstract Set<MimeType> getSupportedOutputFormats();
     
     @Override
-    public void handle(String target, Request baseRequest, 
-            HttpServletRequest request, HttpServletResponse response) 
-            throws IOException, ServletException {
+    protected void service(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         if (request.getMethod().equals("GET")) {
             handleGet(request, response);
             return;

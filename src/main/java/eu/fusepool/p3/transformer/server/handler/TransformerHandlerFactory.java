@@ -26,19 +26,19 @@ import eu.fusepool.p3.transformer.Transformer;
  * @author reto
  */
 public class TransformerHandlerFactory {
-    public static AbstractTransformingHandler getTransformerHandler(SyncTransformer transformer) {
+    public static AbstractTransformingServlet getTransformerHandler(SyncTransformer transformer) {
        if (transformer.isLongRunning()) {
-            return new AsyncTransformerHandler(new LongRunningTransformerWrapper(transformer));
+            return new AsyncTransformerServlet(new LongRunningTransformerWrapper(transformer));
         } else {
-            return new SyncTransformerHandler(transformer);
+            return new SyncTransformerServlet(transformer);
         }
     }
     
-    public static AbstractTransformingHandler getTransformerHandler(AsyncTransformer transformer) {
-        return new AsyncTransformerHandler(transformer);
+    public static AbstractTransformingServlet getTransformerHandler(AsyncTransformer transformer) {
+        return new AsyncTransformerServlet(transformer);
     }
     
-    public static AbstractTransformingHandler getTransformerHandler(Transformer transformer) {
+    public static AbstractTransformingServlet getTransformerHandler(Transformer transformer) {
         if (transformer instanceof SyncTransformer) {
             return TransformerHandlerFactory.getTransformerHandler((SyncTransformer)transformer);
         } else {

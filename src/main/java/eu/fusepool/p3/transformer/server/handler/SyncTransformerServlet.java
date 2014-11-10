@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Bern University of Applied Sciences.
+ * Copyright 2014 reto.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,11 @@
  */
 package eu.fusepool.p3.transformer.server.handler;
 
-import eu.fusepool.p3.transformer.AsyncTransformer;
+import eu.fusepool.p3.transformer.HttpRequestEntity;
+import eu.fusepool.p3.transformer.SyncTransformer;
 import eu.fusepool.p3.transformer.TransformerException;
+import eu.fusepool.p3.transformer.commons.Entity;
+import static eu.fusepool.p3.transformer.server.handler.TransformerServlet.writeResponse;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,38 +29,24 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author reto
  */
-class AsyncTransformerHandler extends TransformerHandler  {
+class SyncTransformerServlet extends TransformerServlet {
 
-    private final AsyncTransformer transformer;
-    private final ASyncResponsesManager aSyncResponsesManager = new ASyncResponsesManager();
+    private SyncTransformer transformer;
 
-    AsyncTransformerHandler(AsyncTransformer transformer) {
+    SyncTransformerServlet(SyncTransformer transformer) {
         super(transformer);
         this.transformer = transformer;
-        transformer.activate(aSyncResponsesManager);
     }
 
     @Override
     protected void handlePost(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
         try {
-            aSyncResponsesManager.handlePost(request, response, transformer);
+            Entity responseEntity = transformer.transform(new HttpRequestEntity(request));
+            writeResponse(responseEntity, response); 
         } catch (TransformerException e) {
             response.setStatus(e.getStatusCode());
             writeResponse(e.getResponseEntity(), response);
-        }
+        }        
     }
-
-    @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final String requestUri = request.getRequestURI();
-        if (requestUri.startsWith(ASyncResponsesManager.JOB_URI_PREFIX)) {
-            aSyncResponsesManager.handleJobRequest(request, response, transformer);
-        } else {
-            super.handleGet(request, response);
-        }
-    }
-
-    
-    
 
 }

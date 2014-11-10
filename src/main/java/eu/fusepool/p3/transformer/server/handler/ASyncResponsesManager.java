@@ -56,9 +56,9 @@ public class ASyncResponsesManager implements AsyncTransformer.CallBackHandler {
         if (requestResult == null) {
             if (transformer.isActive(requestUri)) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                GraphNode responseNode = AbstractTransformingHandler.getServiceNode(request);
+                GraphNode responseNode = AbstractTransformingServlet.getServiceNode(request);
                 responseNode.addProperty(TRANSFORMER.status, TRANSFORMER.Processing);
-                AbstractTransformingHandler.respondFromNode(response, responseNode);
+                AbstractTransformingServlet.respondFromNode(response, responseNode);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return false;
@@ -69,7 +69,7 @@ public class ASyncResponsesManager implements AsyncTransformer.CallBackHandler {
             if (requestResult.exception instanceof TransformerException) {
                 TransformerException te = (TransformerException) requestResult.exception;
                 response.setStatus(te.getStatusCode());
-                TransformerHandler.writeResponse(te.getResponseEntity(), response);
+                TransformerServlet.writeResponse(te.getResponseEntity(), response);
             }
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             PrintWriter out = response.getWriter();

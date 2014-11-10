@@ -15,11 +15,14 @@
  */
 package eu.fusepool.p3.transformer.server;
 
-import eu.fusepool.p3.transformer.server.handler.TransformerFactoryHandler;
+import eu.fusepool.p3.transformer.server.handler.TransformerFactoryServlet;
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import eu.fusepool.p3.transformer.server.handler.TransformerHandlerFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletMapping;
 
 /**
  *
@@ -39,12 +42,16 @@ public class TransformerServer {
      * @throws Exception ugly, but so does the underlying Jetty Server
      */
     public void start(Transformer transformer) throws Exception {
-        server.setHandler(TransformerHandlerFactory.getTransformerHandler(transformer));
-        server.start();
+        final ServletHandler handler = new ServletHandler();
+        handler.addServletWithMapping(new ServletHolder(TransformerHandlerFactory.getTransformerHandler(transformer)),"/");
+        server.setHandler(handler);
+        server.start();   
     }
     
     public void start(TransformerFactory factory) throws Exception {
-        server.setHandler(new TransformerFactoryHandler(factory));
+        final ServletHandler handler = new ServletHandler();
+        handler.addServletWithMapping(new ServletHolder(new TransformerFactoryServlet(factory)),"/");
+        server.setHandler(handler);
         server.start();   
     }
     
