@@ -39,7 +39,7 @@ public class PathFactoryTest {
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
-        TransformerServer server = new TransformerServer(port);
+        TransformerServer server = new TransformerServer(port, true);
         PathTransformerFactory factory = new PathTransformerFactory();
         factory.registerTransformer("/a/simple/one", new SimpleTransformer());
         factory.registerTransformer("/async", new SimpleAsyncTransformer());

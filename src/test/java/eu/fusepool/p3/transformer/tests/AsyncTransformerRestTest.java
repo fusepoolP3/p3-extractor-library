@@ -35,7 +35,7 @@ public class AsyncTransformerRestTest {
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
-        TransformerServer server = new TransformerServer(port);
+        TransformerServer server = new TransformerServer(port, true);
         server.start(new SimpleAsyncTransformer());
     }
 

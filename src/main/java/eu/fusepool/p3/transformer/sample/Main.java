@@ -31,7 +31,7 @@ public class Main {
     }
 
     private static void start(Arguments arguments) throws Exception {
-        TransformerServer server = new TransformerServer(arguments.getPort());
+        TransformerServer server = new TransformerServer(arguments.getPort(), arguments.enableCors());
         //alternatives:
         server.start(new SimpleTransformer());
         //server.start(new LongRunningTransformer());

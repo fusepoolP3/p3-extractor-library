@@ -15,14 +15,17 @@
  */
 package eu.fusepool.p3.transformer.server;
 
+import com.thetransactioncompany.cors.CORSFilter;
 import eu.fusepool.p3.transformer.server.handler.TransformerFactoryServlet;
 import eu.fusepool.p3.transformer.Transformer;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import eu.fusepool.p3.transformer.server.handler.TransformerHandlerFactory;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletMapping;
 
 /**
  *
@@ -31,9 +34,19 @@ import org.eclipse.jetty.servlet.ServletMapping;
 public class TransformerServer {
 
     private final Server server;
-
-    public TransformerServer(int port) {
+    final ServletHandler handler = new ServletHandler();
+    /**
+     * 
+     * @param port the port the server shall listen too
+     * @param cors if CORS support should should be enables
+     */
+    public TransformerServer(int port, boolean cors) {
         server = new Server(port);
+        server.setHandler(handler);
+        if (cors) {
+            handler.addFilterWithMapping(new FilterHolder(new CORSFilter()), "/", 
+                    EnumSet.of(DispatcherType.FORWARD, DispatcherType.INCLUDE,DispatcherType.REQUEST));
+        }
     }
     
     /**
@@ -41,17 +54,13 @@ public class TransformerServer {
      * @param transformer
      * @throws Exception ugly, but so does the underlying Jetty Server
      */
-    public void start(Transformer transformer) throws Exception {
-        final ServletHandler handler = new ServletHandler();
-        handler.addServletWithMapping(new ServletHolder(TransformerHandlerFactory.getTransformerHandler(transformer)),"/");
-        server.setHandler(handler);
+    public void start(Transformer transformer) throws Exception {    
+        handler.addServletWithMapping(new ServletHolder(TransformerHandlerFactory.getTransformerHandler(transformer)),"/");  
         server.start();   
     }
     
     public void start(TransformerFactory factory) throws Exception {
-        final ServletHandler handler = new ServletHandler();
         handler.addServletWithMapping(new ServletHolder(new TransformerFactoryServlet(factory)),"/");
-        server.setHandler(handler);
         server.start();   
     }
     

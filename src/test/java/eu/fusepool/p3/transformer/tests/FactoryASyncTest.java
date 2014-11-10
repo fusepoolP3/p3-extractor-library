@@ -39,7 +39,7 @@ public class FactoryASyncTest {
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
-        TransformerServer server = new TransformerServer(port);
+        TransformerServer server = new TransformerServer(port, true);
         final Transformer transfomer = new SimpleAsyncTransformer();
         server.start(new TransformerFactory() {
 

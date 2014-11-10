@@ -44,14 +44,16 @@ public class SynRestApiTest {
     public void setUp() throws Exception {
         final int port = findFreePort();
         RestAssured.baseURI = "http://localhost:"+port+"/";
-        TransformerServer server = new TransformerServer(port);
+        TransformerServer server = new TransformerServer(port, true);
         server.start(new SimpleTransformer());
     }
 
     @Test
     public void turtleOnGet() {
         Response response = RestAssured.given().header("Accept", "text/turtle")
-                .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle").when()
+                .header("Origin", "http://www.example-social-network.com")
+                .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle")
+                .header("Access-Control-Allow-Origin", "http://www.example-social-network.com").when()
                 .get();
     }
     

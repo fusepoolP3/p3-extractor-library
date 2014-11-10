@@ -30,5 +30,10 @@ public interface Arguments extends ArgumentsWithHelp {
             defaultValue = "7100",
             description = "The port on which the proxy shall listen")
     public int getPort();
+
+    @CommandLine(longName = "enableCors", shortName = {"C"}, 
+            description = "Enable a liberal CORS policy",
+            isSwitch = true)
+    public boolean enableCors();
     
 }
