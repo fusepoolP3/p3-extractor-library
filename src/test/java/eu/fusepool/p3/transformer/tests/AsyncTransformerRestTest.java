@@ -20,6 +20,8 @@ import com.jayway.restassured.response.Response;
 import eu.fusepool.p3.transformer.sample.SimpleAsyncTransformer;
 import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.net.ServerSocket;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,6 +80,44 @@ public class AsyncTransformerRestTest {
         }
         Assert.assertEquals("Didn't get a 200 response eventually", HttpStatus.SC_OK, response2.getStatusCode());
         Assert.assertTrue("Result doesn't contain originally posted text", response2.getBody().asString().contains("hello"));
+    }
+    
+    @Test
+    public void postAndStress() throws InterruptedException {
+        final Set<Exception> exceptions = new HashSet();
+        final Set<Thread> threads = new HashSet<>();
+        Response response = RestAssured.given().header("Accept", "text/turtle")
+                .contentType("text/plain;charset=UTF-8")
+                .content("hello")
+                .expect().statusCode(HttpStatus.SC_ACCEPTED).when()
+                .post();
+        final String location = response.getHeader("location");
+        Assert.assertNotNull("No location header in ACCEPTED- response", location);
+        for (int i = 0; i < 10; i++) {
+            Thread t = new Thread() {
+
+                @Override
+                public void run() {
+                    try {
+                        for (int j = 0; j < 10; j++) {
+                            Response response2 = RestAssured.given().header("Accept", "text/turtle")
+                            .expect()
+                            .header("Content-Type", "text/turtle").when()
+                            .get(location);
+                        }
+                    } catch (Exception e) {
+                        exceptions.add(e);
+                    }
+                }
+                
+            };
+            t.start();
+            threads.add(t);
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
+        Assert.assertTrue("Exceptions retrieving result: "+exceptions, exceptions.isEmpty());
     }
 
     public static int findFreePort() {
