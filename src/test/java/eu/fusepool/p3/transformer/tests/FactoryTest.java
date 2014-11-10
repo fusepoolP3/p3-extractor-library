@@ -18,11 +18,13 @@ package eu.fusepool.p3.transformer.tests;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import eu.fusepool.p3.transformer.Transformer;
+import eu.fusepool.p3.transformer.TransformerException;
 import eu.fusepool.p3.transformer.TransformerFactory;
 import eu.fusepool.p3.transformer.sample.SimpleTransformer;
 import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.net.ServerSocket;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.hamcrest.core.StringContains;
 import org.junit.Before;
@@ -43,6 +45,9 @@ public class FactoryTest {
 
             @Override
             public Transformer getTransformer(HttpServletRequest request) {
+                if ("true".equals(request.getParameter("bad"))) {
+                    throw new TransformerException(HttpServletResponse.SC_BAD_REQUEST, "Bad bad bad");
+                }
                 return new SimpleTransformer();
             }
         });
@@ -53,6 +58,14 @@ public class FactoryTest {
         Response response = RestAssured.given().header("Accept", "text/turtle")
                 .expect().statusCode(HttpStatus.SC_OK).header("Content-Type", "text/turtle").when()
                 .get();
+    }
+    
+    @Test
+    public void badRequest() {
+        RestAssured.given()
+                .expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+                .get("?bad=true");
+        
     }
     
     @Test

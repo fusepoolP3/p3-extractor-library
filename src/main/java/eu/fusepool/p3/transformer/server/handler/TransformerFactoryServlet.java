@@ -43,13 +43,14 @@ public class TransformerFactoryServlet extends HttpServlet {
     private ASyncResponsesManager aSyncResponsesManager = new ASyncResponsesManager();
     private final Map<String, AsyncTransformer> requestId2Transformer = new HashMap<>();
     private final Set<AsyncTransformer> aSyncTransformerSet = Collections.newSetFromMap(
-        new WeakHashMap<AsyncTransformer, Boolean>());
+            new WeakHashMap<AsyncTransformer, Boolean>());
+
     public TransformerFactoryServlet(TransformerFactory factory) {
         this.factory = factory;
     }
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) 
+    protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (request.getMethod().equals("GET")) {
             handleGet(request, response);
@@ -65,7 +66,14 @@ public class TransformerFactoryServlet extends HttpServlet {
 
     public void handlePost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        final Transformer transformer = wrapLongRunning(getTransformer(request, response));
+        final Transformer transformer;
+        try {
+            transformer = wrapLongRunning(getTransformer(request, response));
+        } catch (TransformerException e) {
+            response.setStatus(e.getStatusCode());
+            writeResponse(e.getResponseEntity(), response);
+            return;
+        }
         if (transformer == null) {
             response.sendError(404);
         } else {
@@ -97,7 +105,14 @@ public class TransformerFactoryServlet extends HttpServlet {
                 }
             }
         } else {
-            final Transformer transformer = getTransformer(request, response);
+            final Transformer transformer;
+            try {
+                transformer = getTransformer(request, response);
+            } catch (TransformerException e) {
+                response.setStatus(e.getStatusCode());
+                writeResponse(e.getResponseEntity(), response);
+                return;
+            }
             if (transformer == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             } else {
@@ -106,15 +121,9 @@ public class TransformerFactoryServlet extends HttpServlet {
             }
         }
     }
-    
+
     private Transformer getTransformer(HttpServletRequest request, HttpServletResponse response) throws IOException {
-         try {
-            return factory.getTransformer(request);
-        } catch (TransformerException e) {
-            response.setStatus(e.getStatusCode());
-            writeResponse(e.getResponseEntity(), response);
-            throw e;
-        }      
+        return factory.getTransformer(request);
     }
 
     private Transformer wrapLongRunning(Transformer transformer) {
@@ -123,7 +132,7 @@ public class TransformerFactoryServlet extends HttpServlet {
             if (syncTransformer.isLongRunning()) {
                 return new LongRunningTransformerWrapper(syncTransformer);
             }
-        } 
+        }
         return transformer;
     }
 
