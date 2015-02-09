@@ -151,6 +151,11 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>eu.fusepool.p3</groupId>
+            <artifactId>accept-header-utils</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.jayway.restassured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>2.3.4</version>

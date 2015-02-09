@@ -16,7 +16,7 @@
 
 package eu.fusepool.p3.transformer;
 
-import eu.fusepool.p3.transformer.util.AcceptPreference;
+import eu.fusepool.p3.accept.util.AcceptPreference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

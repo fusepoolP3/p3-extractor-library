@@ -25,7 +25,7 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.servlet.http.HttpServletRequest;
 
-import eu.fusepool.p3.transformer.util.AcceptPreference;
+import eu.fusepool.p3.accept.util.AcceptPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
