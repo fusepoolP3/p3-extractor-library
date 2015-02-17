@@ -7,9 +7,12 @@ package eu.fusepool.p3.transformer.server.handler;
 
 import eu.fusepool.p3.vocab.TRANSFORMER;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,7 +77,14 @@ public abstract class AbstractTransformingServlet extends HttpServlet {
         //TODO content negotiation
         final String responseFormat = SupportedFormat.TURTLE;
         response.setContentType(responseFormat);
-        Serializer.getInstance().serialize(response.getOutputStream(), node.getGraph(), responseFormat);
+        final ServletOutputStream outputStream = response.getOutputStream();
+        try {
+            Serializer.getInstance().serialize(outputStream, node.getGraph(), responseFormat);
+        } catch (RuntimeException ex) {
+            final PrintWriter printWriter = new PrintWriter(outputStream);
+            ex.printStackTrace(printWriter);
+            printWriter.flush();
+        }
     }
     
     /**
