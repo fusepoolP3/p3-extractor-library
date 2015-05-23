@@ -21,11 +21,11 @@ import eu.fusepool.p3.transformer.sample.SimpleTransformer;
 import eu.fusepool.p3.transformer.server.TransformerServer;
 import java.net.ServerSocket;
 import java.util.Iterator;
-import org.apache.clerezza.rdf.core.BNode;
-import org.apache.clerezza.rdf.core.Graph;
-import org.apache.clerezza.rdf.core.Resource;
-import org.apache.clerezza.rdf.core.Triple;
-import org.apache.clerezza.rdf.core.UriRef;
+import org.apache.clerezza.commons.rdf.BlankNode;
+import org.apache.clerezza.commons.rdf.ImmutableGraph;
+import org.apache.clerezza.commons.rdf.RDFTerm;
+import org.apache.clerezza.commons.rdf.Triple;
+import org.apache.clerezza.commons.rdf.IRI;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.http.HttpStatus;
@@ -64,12 +64,12 @@ public class SynRestApiTest {
                 .content("hello")
                 .expect().statusCode(HttpStatus.SC_OK).content(new StringContains("hello")).header("Content-Type", "text/turtle").when()
                 .post();
-        Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
+        ImmutableGraph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
         Iterator<Triple> typeTriples = graph.filter(null, RDF.type, 
                 SimpleTransformer.TEXUAL_CONTENT);
         Assert.assertTrue("No type triple found", typeTriples.hasNext());
-        Resource textDescription = typeTriples.next().getSubject();
-        Assert.assertTrue("TextDescription resource is not a BNode", textDescription instanceof BNode);
+        RDFTerm textDescription = typeTriples.next().getSubject();
+        Assert.assertTrue("TextDescription resource is not a BlankNode", textDescription instanceof BlankNode);
     }
     
     @Test
@@ -81,13 +81,13 @@ public class SynRestApiTest {
                 .content("hello")
                 .expect().statusCode(HttpStatus.SC_OK).content(new StringContains("hello")).header("Content-Type", "text/turtle").when()
                 .post();
-        Graph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
+        ImmutableGraph graph = Parser.getInstance().parse(response.getBody().asInputStream(), "text/turtle");
         Iterator<Triple> typeTriples = graph.filter(null, RDF.type, 
                 SimpleTransformer.TEXUAL_CONTENT);
         Assert.assertTrue("No type triple found", typeTriples.hasNext());
-        Resource textDescription = typeTriples.next().getSubject();
-        Assert.assertTrue("TextDescription resource is not a UriRef", textDescription instanceof UriRef);
-        Assert.assertEquals("Resource doesn't have the right URI", contentUri, ((UriRef)textDescription).getUnicodeString());
+        RDFTerm textDescription = typeTriples.next().getSubject();
+        Assert.assertTrue("TextDescription resource is not a IRI", textDescription instanceof IRI);
+        Assert.assertEquals("RDFTerm doesn't have the right URI", contentUri, ((IRI)textDescription).getUnicodeString());
     }
     
     @Test

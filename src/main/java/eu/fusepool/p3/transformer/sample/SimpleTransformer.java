@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import org.apache.clerezza.rdf.core.BNode;
-import org.apache.clerezza.rdf.core.Resource;
-import org.apache.clerezza.rdf.core.TripleCollection;
-import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
+import org.apache.clerezza.commons.rdf.BlankNode;
+import org.apache.clerezza.commons.rdf.RDFTerm;
+import org.apache.clerezza.commons.rdf.Graph;
+import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.commons.rdf.impl.utils.simple.SimpleGraph;
 import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.ontologies.SIOC;
 import org.apache.clerezza.rdf.utils.GraphNode;
@@ -40,7 +40,7 @@ import org.apache.commons.io.IOUtils;
 
 public class SimpleTransformer extends RdfGeneratingTransformer {
     
-    public static final UriRef TEXUAL_CONTENT = new UriRef("http://example.org/ontology#TextualContent");
+    public static final IRI TEXUAL_CONTENT = new IRI("http://example.org/ontology#TextualContent");
     private static final List<String> forbiddenStrings = Arrays.asList(new String[] {"Democracy for Hong Kong"});
 
     @Override
@@ -54,19 +54,19 @@ public class SimpleTransformer extends RdfGeneratingTransformer {
     }
 
     @Override
-    protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
+    protected Graph generateRdf(HttpRequestEntity entity) throws IOException {
         final String text = IOUtils.toString(entity.getData(), "UTF-8");
         if (forbiddenStrings.contains(text)) {
             throw new TransformerException(403, "fobidden!");
         }
-        final TripleCollection result = new SimpleMGraph();
-        final Resource resource = entity.getContentLocation() == null?
-                new BNode() :
-                new UriRef(entity.getContentLocation().toString());
+        final Graph result = new SimpleGraph();
+        final RDFTerm resource = entity.getContentLocation() == null?
+                new BlankNode() :
+                new IRI(entity.getContentLocation().toString());
         final GraphNode node = new GraphNode(resource, result);
         node.addProperty(RDF.type, TEXUAL_CONTENT);
         node.addPropertyValue(SIOC.content, text);
-        node.addPropertyValue(new UriRef("http://example.org/ontology#textLength"), text.length());
+        node.addPropertyValue(new IRI("http://example.org/ontology#textLength"), text.length());
         return result;
     }
 

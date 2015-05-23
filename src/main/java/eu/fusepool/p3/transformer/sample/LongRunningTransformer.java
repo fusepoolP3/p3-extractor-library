@@ -23,10 +23,10 @@ import java.util.Collections;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import org.apache.clerezza.rdf.core.BNode;
-import org.apache.clerezza.rdf.core.TripleCollection;
-import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
+import org.apache.clerezza.commons.rdf.BlankNode;
+import org.apache.clerezza.commons.rdf.Graph;
+import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.commons.rdf.impl.utils.simple.SimpleGraph;
 import org.apache.clerezza.rdf.ontologies.RDF;
 import org.apache.clerezza.rdf.ontologies.RDFS;
 import org.apache.clerezza.rdf.ontologies.SIOC;
@@ -47,19 +47,19 @@ public class LongRunningTransformer extends RdfGeneratingTransformer {
     }
 
     @Override
-    protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
+    protected Graph generateRdf(HttpRequestEntity entity) throws IOException {
         try {
             Thread.sleep(5*1000);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
         final String text = IOUtils.toString(entity.getData(), "UTF-8");
-        final TripleCollection result = new SimpleMGraph();
-        final GraphNode node = new GraphNode(new BNode(), result);
-        node.addProperty(RDF.type, new UriRef("http://example.org/ontology#TextDescription"));
+        final Graph result = new SimpleGraph();
+        final GraphNode node = new GraphNode(new BlankNode(), result);
+        node.addProperty(RDF.type, new IRI("http://example.org/ontology#TextDescription"));
         node.addPropertyValue(RDFS.comment, "This took a long while");
         node.addPropertyValue(SIOC.content, text);
-        node.addPropertyValue(new UriRef("http://example.org/ontology#textLength"), text.length());
+        node.addPropertyValue(new IRI("http://example.org/ontology#textLength"), text.length());
         return result;
     }
 

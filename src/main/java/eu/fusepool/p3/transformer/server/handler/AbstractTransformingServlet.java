@@ -16,9 +16,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.clerezza.rdf.core.MGraph;
-import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
+import org.apache.clerezza.commons.rdf.Graph;
+import org.apache.clerezza.commons.rdf.IRI;
+import org.apache.clerezza.commons.rdf.impl.utils.simple.SimpleGraph;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 import org.apache.clerezza.rdf.core.serializedform.UnsupportedFormatException;
@@ -88,13 +88,13 @@ public abstract class AbstractTransformingServlet extends HttpServlet {
     }
     
     /**
-     * Returns a GraphNode representing the requested resources in an empty MGraph
+     * Returns a GraphNode representing the requested resources in an empty Graph
      * @param request
      * @return a GraphNode representing the resource
      */
     static GraphNode getServiceNode(HttpServletRequest request) {
-        final UriRef serviceUri = new UriRef(getFullRequestUrl(request));
-        final MGraph resultGraph = new SimpleMGraph();
+        final IRI serviceUri = new IRI(getFullRequestUrl(request));
+        final Graph resultGraph = new SimpleGraph();
         return new GraphNode(serviceUri, resultGraph);
     }
 

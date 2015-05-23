@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
-import org.apache.clerezza.rdf.core.TripleCollection;
+import org.apache.clerezza.commons.rdf.Graph;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
 
@@ -43,7 +43,7 @@ public abstract class RdfGeneratingTransformer implements SyncTransformer {
         //TODO check content type matches supportedInputFormat
         //TODO content negotiation
         final String responseFormat = SupportedFormat.TURTLE;
-        final TripleCollection generatedRdf = generateRdf(entity);
+        final Graph generatedRdf = generateRdf(entity);
         return new WritingEntity() {
 
             @Override
@@ -77,6 +77,6 @@ public abstract class RdfGeneratingTransformer implements SyncTransformer {
      * @return the graph resulting from the transformation
      * @throws IOException 
      */
-    protected abstract TripleCollection generateRdf(HttpRequestEntity entity) throws IOException;
+    protected abstract Graph generateRdf(HttpRequestEntity entity) throws IOException;
     
 }
